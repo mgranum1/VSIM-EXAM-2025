@@ -285,7 +285,7 @@ void MainWindow::on_action_Open_triggered()
 void MainWindow::onButton1Clicked()
 {
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
-        "../../Assets/Models/Rat_2.0.obj",
+        "../../Assets/Models/Emma.obj",
         "../../Assets/Textures/Rat 2.0.png",
         glm::vec3(10.0f, 00.0f, 0.0f)
         );

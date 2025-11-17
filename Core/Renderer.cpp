@@ -122,6 +122,10 @@ void Renderer::initVulkan() {
         }
     }
 
+    spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 60, 0));
+
+
+
     //createTerrainEntity(&m_gameWorld);
 
     qDebug() << "How many entities in the scene?:" << entityManager->getEntityCount();
@@ -1856,11 +1860,12 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
     // Camera
     Camera* cam = BBLHub::Instance().GetCamera();
     cam->processInput(keyW, keyA, keyS, keyD, keyQ, keyE, deltaTime);
-
     m_gameWorld.update(deltaTime);
 
     // Get renderable entities
     std::vector<bbl::EntityID> renderableEntities = entityManager->getEntitiesWith<bbl::Transform, bbl::Render>();
+
+    }
 
     // Calculate alignment
     VkPhysicalDeviceProperties properties;
@@ -1874,23 +1879,21 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
     char* mappedData = static_cast<char*>(data);
 
     size_t entityIndex = 0;
-    for (bbl::EntityID entity : renderableEntities)
-    {
+    for (bbl::EntityID entity : renderableEntities) {
         bbl::Transform* transform = entityManager->getComponent<bbl::Transform>(entity);
         if (!transform) {
-            // Still increment entityIndex to maintain consistent indexing
             ++entityIndex;
             continue;
         }
 
-        // Always fill uniform buffer data regardless of visibility
         UniformBufferObject* ubo = reinterpret_cast<UniformBufferObject*>(mappedData + (entityIndex * alignedUniformSize));
         ubo->model = transform->getModelMatrix();
-        ubo->lightPos = glm::vec3{0, 60, 0}; //hardcoded, should be a "sun" entity for example
+        ubo->lightPos = lightPosition; // Position of first entity
         ubo->view = cam->getViewMatrix();
-        ubo->proj = glm::perspective(glm::radians(cam->getFov()),swapChainExtent.width / static_cast<float>(swapChainExtent.height),0.1f,1000.0f);
+        ubo->proj = glm::perspective(glm::radians(cam->getFov()),
+                                     swapChainExtent.width / static_cast<float>(swapChainExtent.height),
+                                     0.1f, 1000.0f);
         ubo->proj[1][1] *= -1.0f;
-
         ++entityIndex;
     }
 
