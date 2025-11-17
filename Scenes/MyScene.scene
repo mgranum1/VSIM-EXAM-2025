@@ -1,0 +1,317 @@
+{
+    "entities": [
+        {
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 0,
+                "modelPath": ""
+            },
+            "Render": {
+                "meshResourceID": 0,
+                "opacity": 1.0,
+                "textureResourceID": 1,
+                "usePhong": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/volcan.png",
+                "textureResourceID": 1
+            },
+            "Transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 1
+        },
+        {
+            "Audio": {
+                "looping": false,
+                "muted": false,
+                "volume": 1.0
+            },
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": false,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 1,
+                "modelPath": "../../Assets/Models/Rat_2.0.obj"
+            },
+            "Physics": {
+                "acceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "useGravity": true,
+                "velocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Render": {
+                "meshResourceID": 1,
+                "opacity": 1.0,
+                "textureResourceID": 2,
+                "usePhong": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/Rat 2.0.png",
+                "textureResourceID": 2
+            },
+            "Transform": {
+                "position": [
+                    9.899999618530273,
+                    33.5,
+                    -0.5
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 2
+        },
+        {
+            "Audio": {
+                "looping": false,
+                "muted": false,
+                "volume": 1.0
+            },
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": false,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 2,
+                "modelPath": "../../Assets/Models/Rat_2.0.obj"
+            },
+            "Physics": {
+                "acceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "useGravity": true,
+                "velocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Render": {
+                "meshResourceID": 2,
+                "opacity": 1.0,
+                "textureResourceID": 2,
+                "usePhong": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/Rat 2.0.png",
+                "textureResourceID": 2
+            },
+            "Transform": {
+                "position": [
+                    9.699999809265137,
+                    33.5,
+                    0.6000000238418579
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 3
+        },
+        {
+            "Audio": {
+                "looping": false,
+                "muted": false,
+                "volume": 1.0
+            },
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": false,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 3,
+                "modelPath": "../../Assets/Models/Rat_2.0.obj"
+            },
+            "Physics": {
+                "acceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "useGravity": true,
+                "velocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Render": {
+                "meshResourceID": 3,
+                "opacity": 1.0,
+                "textureResourceID": 2,
+                "usePhong": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/Rat 2.0.png",
+                "textureResourceID": 2
+            },
+            "Transform": {
+                "position": [
+                    10.899999618530273,
+                    33.5,
+                    0.04999998211860657
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 4
+        },
+        {
+            "Audio": {
+                "looping": false,
+                "muted": false,
+                "volume": 1.0
+            },
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": false,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 4,
+                "modelPath": "../../Assets/Models/Rat_2.0.obj"
+            },
+            "Physics": {
+                "acceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "useGravity": true,
+                "velocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Render": {
+                "meshResourceID": 4,
+                "opacity": 1.0,
+                "textureResourceID": 2,
+                "usePhong": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/Rat 2.0.png",
+                "textureResourceID": 2
+            },
+            "Transform": {
+                "position": [
+                    10.699999809265137,
+                    33.5,
+                    1.0499999523162842
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 5
+        }
+    ],
+    "entity_names": {
+        "1": "Terrain",
+        "2": "Rat_2.0",
+        "3": "Rat_2.0",
+        "4": "Rat_2.0",
+        "5": "Rat_2.0"
+    },
+    "scene_metadata": {
+        "engine": "BBL Engine",
+        "entity_count": 5,
+        "name": "Untitled Scene",
+        "version": "1.0"
+    }
+}
