@@ -374,6 +374,7 @@ json SceneSerializer::serializeRender(const Render& render)
         {"textureResourceID", render.textureResourceID},
         {"visible", render.visible},
         {"usePhong", render.usePhong},
+        {"usePoint", render.usePoint},
         {"opacity", render.opacity}
     };
 }
@@ -447,6 +448,7 @@ Render SceneSerializer::deserializeRender(const json& j)
     render.textureResourceID = j["textureResourceID"].get<size_t>();
     render.visible = j["visible"].get<bool>();
     render.usePhong = j["usePhong"].get<bool>();
+    render.usePoint = j["usePoint"].get<bool>();
     render.opacity = j["opacity"].get<float>();
     return render;
 }
