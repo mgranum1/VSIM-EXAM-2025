@@ -1865,6 +1865,13 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
     // Get renderable entities
     std::vector<bbl::EntityID> renderableEntities = entityManager->getEntitiesWith<bbl::Transform, bbl::Render>();
 
+
+    glm::vec3 lightPosition = glm::vec3{0, 60, 0};
+    if (!renderableEntities.empty()) {
+        bbl::Transform* firstTransform = entityManager->getComponent<bbl::Transform>(renderableEntities[0]);
+        if (firstTransform) {
+            lightPosition = firstTransform->position;
+        }
     }
 
     // Calculate alignment
