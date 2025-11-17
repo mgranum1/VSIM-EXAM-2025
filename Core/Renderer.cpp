@@ -1886,7 +1886,7 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
         // Always fill uniform buffer data regardless of visibility
         UniformBufferObject* ubo = reinterpret_cast<UniformBufferObject*>(mappedData + (entityIndex * alignedUniformSize));
         ubo->model = transform->getModelMatrix();
-        ubo->lightPos = glm::vec3{1, 1, 10};
+        ubo->lightPos = glm::vec3{0, 60, 0}; //hardcoded, should be a "sun" entity for example
         ubo->view = cam->getViewMatrix();
         ubo->proj = glm::perspective(glm::radians(cam->getFov()),swapChainExtent.width / static_cast<float>(swapChainExtent.height),0.1f,1000.0f);
         ubo->proj[1][1] *= -1.0f;
