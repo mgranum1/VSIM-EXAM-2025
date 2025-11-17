@@ -63,6 +63,7 @@ struct Render
     size_t textureResourceID{0};
     bool visible{true};
     bool usePhong{false};
+    bool usePoint{false};
     float opacity{1.0f};
 };
 

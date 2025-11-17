@@ -1,4 +1,3 @@
-// ModelLoader.cpp - Refactored to only load model data
 #include "ModelLoader.h"
 #include "../../External/tiny_obj_loader.h"
 #include <qdebug.h>
@@ -80,12 +79,11 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
 
     std::string modelDir = modelPath.substr(0, modelPath.find_last_of("/\\") + 1);
 
-    // Convert materials to our format
+    // --- Materials (unchanged) ---
     for (const auto& mat : materials)
     {
         MaterialData materialData;
 
-        // Set texture paths
         if (!mat.diffuse_texname.empty()) {
             materialData.diffuseTexturePath = modelDir + mat.diffuse_texname;
         }
@@ -96,30 +94,27 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
             materialData.specularTexturePath = modelDir + mat.specular_texname;
         }
 
-        // Set material properties
-        materialData.ambient = glm::vec3(mat.ambient[0], mat.ambient[1], mat.ambient[2]);
-        materialData.diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+        materialData.ambient  = glm::vec3(mat.ambient[0],  mat.ambient[1],  mat.ambient[2]);
+        materialData.diffuse  = glm::vec3(mat.diffuse[0],  mat.diffuse[1],  mat.diffuse[2]);
         materialData.specular = glm::vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
         materialData.shininess = mat.shininess;
 
         modelData.materials.push_back(materialData);
     }
 
-    // Override with custom texture if provided
     if (!customTexturePath.empty()) {
         if (modelData.materials.empty()) {
             MaterialData defaultMaterial;
             defaultMaterial.diffuseTexturePath = customTexturePath;
             modelData.materials.push_back(defaultMaterial);
         } else {
-            // Apply custom texture to all materials
             for (auto& mat : modelData.materials) {
                 mat.diffuseTexturePath = customTexturePath;
             }
         }
     }
 
-    // Process each shape
+    // --- Normal face-based mesh loading (unchanged) ---
     for (size_t s = 0; s < shapes.size(); ++s)
     {
         const auto& shape = shapes[s];
@@ -143,7 +138,6 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
         }
         meshData.materialIndex = chosenMat;
 
-        // Build vertices & indices
         std::unordered_map<Vertex, uint32_t> uniqueVertices;
 
         for (const auto& index : shape.mesh.indices)
@@ -156,34 +150,35 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
 
             Vertex vertex{};
             int vi = index.vertex_index;
+
+            // Position
             vertex.pos = {
                 attrib.vertices[3 * vi + 0],
                 attrib.vertices[3 * vi + 1],
                 attrib.vertices[3 * vi + 2]
             };
 
+            // UV
             if (safe_attrib_texcoord_exists(attrib, index.texcoord_index)) {
                 vertex.texCoord = {
                     attrib.texcoords[2 * index.texcoord_index + 0],
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1] // Flip Y
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
             } else {
                 vertex.texCoord = {0.0f, 0.0f};
             }
 
-            // Check for vertex colors
-            if (index.vertex_index >= 0 &&
-                attrib.colors.size() > 3 * index.vertex_index + 2) {
+            // Color from v x y z r g b   <--- this is your old ObjMesh behavior
+            if (vi >= 0 && attrib.colors.size() > 3 * vi + 2) {
                 vertex.color = {
-                    attrib.colors[3 * index.vertex_index + 0],
-                    attrib.colors[3 * index.vertex_index + 1],
-                    attrib.colors[3 * index.vertex_index + 2]
+                    attrib.colors[3 * vi + 0],
+                    attrib.colors[3 * vi + 1],
+                    attrib.colors[3 * vi + 2]
                 };
             } else {
                 vertex.color = {1.0f, 1.0f, 1.0f};
             }
 
-            // Check for existing vertex or add new one
             auto it = uniqueVertices.find(vertex);
             if (it == uniqueVertices.end()) {
                 uint32_t newIndex = static_cast<uint32_t>(meshData.vertices.size());
@@ -200,7 +195,6 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                  << "indices:" << meshData.indices.size()
                  << "material:" << meshData.materialIndex;
 
-        // Only add mesh if it has valid data
         if (!meshData.vertices.empty() && !meshData.indices.empty()) {
             modelData.meshes.push_back(std::move(meshData));
         } else {
@@ -209,10 +203,58 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
         }
     }
 
+    // ---------- NEW: handle OBJ files with only `v` (no faces) ----------
+    if (modelData.meshes.empty() && !attrib.vertices.empty())
+    {
+        qDebug() << "OBJ has vertices but no faces. Creating point-cloud mesh.";
+
+        MeshData meshData;
+        meshData.materialIndex = modelData.materials.empty() ? -1 : 0;
+
+        size_t vertexCount = attrib.vertices.size() / 3;
+        meshData.vertices.reserve(vertexCount);
+        meshData.indices.reserve(vertexCount);
+
+        for (size_t vi = 0; vi < vertexCount; ++vi)
+        {
+            Vertex v{};
+
+            v.pos = {
+                attrib.vertices[3 * vi + 0],
+                attrib.vertices[3 * vi + 1],
+                attrib.vertices[3 * vi + 2]
+            };
+
+            if (attrib.colors.size() > 3 * vi + 2) {
+                v.color = {
+                    attrib.colors[3 * vi + 0],
+                    attrib.colors[3 * vi + 1],
+                    attrib.colors[3 * vi + 2]
+                };
+            } else {
+                v.color = {1.0f, 1.0f, 1.0f};
+            }
+
+            v.texCoord = {0.0f, 0.0f};
+
+            meshData.indices.push_back(
+                static_cast<uint32_t>(meshData.vertices.size())
+                );
+            meshData.vertices.push_back(v);
+        }
+
+        modelData.meshes.push_back(std::move(meshData));
+
+        qDebug() << "Point-cloud mesh created:"
+                 << "vertices:" << vertexCount
+                 << "indices:"  << vertexCount;
+    }
+
     qDebug() << "Model loaded successfully:"
              << "Name:" << modelData.name.c_str()
              << "Meshes:" << modelData.meshes.size()
              << "Materials:" << modelData.materials.size();
 }
+
 
 } // namespace bbl

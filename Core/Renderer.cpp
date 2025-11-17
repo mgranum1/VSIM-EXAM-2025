@@ -89,8 +89,9 @@ void Renderer::initVulkan() {
     createImageViews();
     createRenderPass();
     createDescriptorSetLayout();
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline);
-    createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+    createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
     createCommandPool();
     createColorResources();
     createDepthResources();
@@ -123,7 +124,7 @@ void Renderer::initVulkan() {
     }
 
     spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 60, 0));
-
+    //spawnModel("../../Assets/Models/pointcloud.obj","", glm::vec3(0, 0, 0));
 
 
     //createTerrainEntity(&m_gameWorld);
@@ -180,6 +181,7 @@ bbl::EntityID Renderer::spawnModel(const std::string& modelPath,
             // Update render component with texture
             if (auto* render = entityManager->getComponent<bbl::Render>(newEntity)) {
                 render->textureResourceID = textureResourceID;
+                render->usePoint = false;
             }
         }
 
@@ -458,8 +460,9 @@ void Renderer::recreateSwapChain() {
     createSwapChain();
     createImageViews();
     createRenderPass();
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline);
-    createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+    createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
     createColorResources();
     createDepthResources();
     createFramebuffers();
@@ -853,7 +856,7 @@ void Renderer::createDescriptorSetLayout() {
     }
 }
 
-void Renderer::createGraphicsPipeline(std::string vertPath, std::string fragPath, VkPipeline& Pipeline) {
+void Renderer::createGraphicsPipeline(std::string vertPath, std::string fragPath, VkPipeline& Pipeline, VkPrimitiveTopology topology) {
     auto vertShaderCode = readFile(PATH + vertPath);
     auto fragShaderCode = readFile(PATH + fragPath);
 
@@ -887,7 +890,7 @@ void Renderer::createGraphicsPipeline(std::string vertPath, std::string fragPath
     // 2. Input assembly
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputAssembly.topology = topology;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
     // 3. Viewport & Scissor (Modified for dynamic state)
@@ -1782,7 +1785,15 @@ void Renderer::createCommandBuffers() {
             // Always bind descriptor set (regardless of visibility, this is for convenience sake)
             if (renderComp->usePhong == true) {
                 vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, phongPipeline);
-            } else {
+            }
+
+            else if (renderComp->usePoint == true)
+            {
+                vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pointPipeline);
+            }
+
+            else
+            {
                 vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
             }
 

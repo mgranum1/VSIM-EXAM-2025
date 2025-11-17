@@ -367,6 +367,7 @@ void MainWindow::onSceneObjectSelected(QListWidgetItem* item)
         QVariantMap renderFields;
         renderFields["Visible"] = render->visible;
         renderFields["Use Phong"] = render->usePhong;
+        renderFields["Use Points"] = render->usePoint;
         addComponentUI("Render Component", renderFields);
         componentCount++;
 
@@ -537,6 +538,12 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
                             {
                                 render->usePhong = valid;
                             }
+
+                            else if (field == "Use Points")
+                            {
+                                render->usePoint = valid;
+                            }
+
                             mVulkanWindow->recreateSwapChain();
                             mVulkanWindow->requestUpdate();
                         });
