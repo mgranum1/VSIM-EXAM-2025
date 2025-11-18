@@ -1,0 +1,88 @@
+{
+    "entities": [
+        {
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 0,
+                "modelPath": "../../Assets/Models/Ball2.obj"
+            },
+            "Render": {
+                "meshResourceID": 0,
+                "opacity": 1.0,
+                "textureResourceID": 1,
+                "usePhong": false,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/sun.jpg",
+                "textureResourceID": 1
+            },
+            "Transform": {
+                "position": [
+                    1000.0,
+                    400.0,
+                    -200.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "entity_id": 1
+        },
+        {
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 1,
+                "modelPath": "../../Assets/Models/PointcloudTriangulated_with_mat.obj"
+            },
+            "Render": {
+                "meshResourceID": 1,
+                "opacity": 1.0,
+                "textureResourceID": 0,
+                "usePhong": true,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/notexture.jpg",
+                "textureResourceID": 0
+            },
+            "Transform": {
+                "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 2
+        }
+    ],
+    "entity_names": {
+        "1": "Ball2",
+        "2": "PointcloudTriangulated_with_mat"
+    },
+    "scene_metadata": {
+        "engine": "BBL Engine",
+        "entity_count": 2,
+        "name": "Untitled Scene",
+        "version": "1.0"
+    }
+}

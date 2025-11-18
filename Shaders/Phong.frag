@@ -15,7 +15,7 @@ void main()
     bool blinn = true;
     vec3 color = texture(texSampler, inTexCoord).rgb;
     // ambient
-    vec3 ambient = 0.05 * color;
+    vec3 ambient = 0.15 * color;
     // diffuse
     vec3 lightDir = normalize(lightPos - inPos);
     vec3 normal = normalize(inNormal);
