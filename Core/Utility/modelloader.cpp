@@ -13,8 +13,9 @@ namespace std {
 template<> struct hash<Vertex> {
     size_t operator()(Vertex const& vertex) const {
         return ((hash<glm::vec3>()(vertex.pos) ^
-                 (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-               (hash<glm::vec2>()(vertex.texCoord) << 1);
+                 (hash<glm::vec3>()(vertex.normal) << 1)) >> 1) ^
+               ((hash<glm::vec3>()(vertex.color) << 1) ^
+                (hash<glm::vec2>()(vertex.texCoord) << 1));
     }
 };
 }
@@ -23,7 +24,8 @@ namespace bbl
 {
 // Equality operator for vertices
 bool operator==(const Vertex& a, const Vertex& b) {
-    return a.pos == b.pos && a.color == b.color && a.texCoord == b.texCoord;
+    return a.pos == b.pos && a.normal == b.normal &&
+           a.color == b.color && a.texCoord == b.texCoord;
 }
 
 // Helper: safe check for index range
@@ -39,6 +41,14 @@ static inline bool safe_attrib_texcoord_exists(const tinyobj::attrib_t& attrib,
     if (texcoord_index < 0) return false;
     size_t required = static_cast<size_t>(2 * texcoord_index + 1);
     return required < attrib.texcoords.size();
+}
+
+// Add helper for normal checking
+static inline bool safe_attrib_normal_exists(const tinyobj::attrib_t& attrib,
+                                             int normal_index) {
+    if (normal_index < 0) return false;
+    size_t required = static_cast<size_t>(3 * normal_index + 2);
+    return required < attrib.normals.size();
 }
 
 std::unique_ptr<ModelData> ModelLoader::loadModel(const std::string& modelPath,
@@ -79,7 +89,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
 
     std::string modelDir = modelPath.substr(0, modelPath.find_last_of("/\\") + 1);
 
-    // --- Materials (unchanged) ---
+
     for (const auto& mat : materials)
     {
         MaterialData materialData;
@@ -114,7 +124,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
         }
     }
 
-    // --- Normal face-based mesh loading (unchanged) ---
+    //  Normal face-based mesh loading with normals
     for (size_t s = 0; s < shapes.size(); ++s)
     {
         const auto& shape = shapes[s];
@@ -157,6 +167,18 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                 attrib.vertices[3 * vi + 1],
                 attrib.vertices[3 * vi + 2]
             };
+
+            // Normal - ADDED THIS SECTION
+            if (safe_attrib_normal_exists(attrib, index.normal_index)) {
+                vertex.normal = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+            } else {
+                // Fallback: default upward normal
+                vertex.normal = {0.0f, 1.0f, 0.0f};
+            }
 
             // UV
             if (safe_attrib_texcoord_exists(attrib, index.texcoord_index)) {
@@ -203,7 +225,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
         }
     }
 
-    // ---------- NEW: handle OBJ files with only `v` (no faces) ----------
+
     if (modelData.meshes.empty() && !attrib.vertices.empty())
     {
         qDebug() << "OBJ has vertices but no faces. Creating point-cloud mesh.";
@@ -224,6 +246,9 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                 attrib.vertices[3 * vi + 1],
                 attrib.vertices[3 * vi + 2]
             };
+
+            // Add normal for point cloud (default upward)
+            v.normal = {0.0f, 1.0f, 0.0f};
 
             if (attrib.colors.size() > 3 * vi + 2) {
                 v.color = {
@@ -255,6 +280,5 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
              << "Meshes:" << modelData.meshes.size()
              << "Materials:" << modelData.materials.size();
 }
-
 
 } // namespace bbl

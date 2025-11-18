@@ -20,19 +20,19 @@
             },
             "Transform": {
                 "position": [
-                    1000.0,
-                    400.0,
-                    -200.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
+                    -7.0,
+                    300.0,
                     0.0
                 ],
+                "rotation": [
+                    -0.5,
+                    0.6000000238418579,
+                    0.10000000149011612
+                ],
                 "scale": [
-                    10.0,
-                    10.0,
-                    10.0
+                    25.0,
+                    25.200000762939453,
+                    25.0
                 ]
             },
             "entity_id": 1
@@ -41,23 +41,23 @@
             "Mesh": {
                 "meshIndex": 0,
                 "meshResourceID": 1,
-                "modelPath": "../../Assets/Models/PointcloudTriangulated_with_mat.obj"
+                "modelPath": "../../Assets/Models/PointcloudTriangulated_rotated.obj"
             },
             "Render": {
                 "meshResourceID": 1,
                 "opacity": 1.0,
-                "textureResourceID": 0,
+                "textureResourceID": 2,
                 "usePhong": true,
                 "usePoint": false,
                 "visible": true
             },
             "Texture": {
-                "texturePath": "../../Assets/Textures/notexture.jpg",
-                "textureResourceID": 0
+                "texturePath": "../../Assets/Textures/pointcloud3.png",
+                "textureResourceID": 2
             },
             "Transform": {
                 "position": [
-                    0.6000000238418579,
+                    0.20000000298023224,
                     0.0,
                     0.20000000298023224
                 ],
@@ -77,7 +77,7 @@
     ],
     "entity_names": {
         "1": "Ball2",
-        "2": "PointcloudTriangulated_with_mat"
+        "2": "PointcloudTriangulated_rotated"
     },
     "scene_metadata": {
         "engine": "BBL Engine",

@@ -79,6 +79,8 @@ struct UniformBufferObject
     alignas(16) glm::mat4 proj;
     alignas(16) glm::vec3 lightPos;
     alignas(16) glm::vec3 viewPos;
+    alignas(16) glm::vec3 lightDir;
+    alignas(4) float lightIntensity;
 };
 
 #endif // UTILITIES_H

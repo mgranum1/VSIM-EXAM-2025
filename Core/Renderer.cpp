@@ -123,10 +123,10 @@ void Renderer::initVulkan() {
         }
     }
     //Adding a Lightsource
-   spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 60, 0));
+    spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 300, 0));
 
     //Adding the point cloud
-    spawnModel("../../Assets/Models/PointcloudTriangulated_with_mat.obj","../../Assets/Textures/notexture.jpg", glm::vec3(0, 0, 0));
+    spawnModel("../../Assets/Models/PointcloudTriangulated_rotated.obj","../../Assets/Textures/pointcloud3.png", glm::vec3(0, 0, 0));
 
 
     //createTerrainEntity(&m_gameWorld);
@@ -1879,14 +1879,22 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
     // Get renderable entities
     std::vector<bbl::EntityID> renderableEntities = entityManager->getEntitiesWith<bbl::Transform, bbl::Render>();
 
-
     glm::vec3 lightPosition = glm::vec3{0, 60, 0};
+    glm::vec3 lightDirection = glm::vec3{0, -1, 0};
+
     if (!renderableEntities.empty()) {
         bbl::Transform* firstTransform = entityManager->getComponent<bbl::Transform>(renderableEntities[0]);
         if (firstTransform) {
             lightPosition = firstTransform->position;
+
+            glm::mat4 rotationMatrix = firstTransform->getRotationMatrix();
+
+            glm::vec4 forward = rotationMatrix * glm::vec4(0, 0, -1, 0);
+            lightDirection = glm::normalize(glm::vec3(forward));
         }
     }
+
+    float lightIntensity = 1.0f;
 
     // Calculate alignment
     VkPhysicalDeviceProperties properties;
@@ -1909,11 +1917,14 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
 
         UniformBufferObject* ubo = reinterpret_cast<UniformBufferObject*>(mappedData + (entityIndex * alignedUniformSize));
         ubo->model = transform->getModelMatrix();
-        ubo->lightPos = lightPosition; // Position of first entity
+        ubo->lightPos = lightPosition;
+        ubo->lightDir = lightDirection;
+        ubo->viewPos = cam->getPosition();
         ubo->view = cam->getViewMatrix();
         ubo->proj = glm::perspective(glm::radians(cam->getFov()),
                                      swapChainExtent.width / static_cast<float>(swapChainExtent.height),
                                      0.1f, 1000.0f);
+        ubo->lightIntensity = lightIntensity;
         ubo->proj[1][1] *= -1.0f;
         ++entityIndex;
     }

@@ -42,6 +42,17 @@ struct Transform
         model = glm::scale(model, scale);
         return model;
     }
+
+    glm::mat4 getRotationMatrix() const
+    {
+        glm::mat4 rotMatrix = glm::mat4(1.0f);
+        rotMatrix = glm::rotate(rotMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        rotMatrix = glm::rotate(rotMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        rotMatrix = glm::rotate(rotMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        return rotMatrix;
+    }
+
+
 };
 
 struct Mesh
