@@ -123,10 +123,10 @@ void Renderer::initVulkan() {
         }
     }
     //Adding a Lightsource
-    spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 300, 0));
+    //spawnModel("../../Assets/Models/Ball2.obj","../../Assets/Textures/sun.jpg", glm::vec3(0, 300, 0));
 
     //Adding the point cloud
-    spawnModel("../../Assets/Models/PointcloudTriangulated_rotated.obj","../../Assets/Textures/pointcloud3.png", glm::vec3(0, 0, 0));
+    //spawnModel("../../Assets/Models/PointcloudTriangulated_rotated.obj","../../Assets/Textures/pointcloud3.png", glm::vec3(0, 0, 0));
 
 
     //createTerrainEntity(&m_gameWorld);

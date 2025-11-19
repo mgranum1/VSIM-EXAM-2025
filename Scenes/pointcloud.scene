@@ -55,11 +55,11 @@
                 "position": [
                     0.20000000298023224,
                     0.0,
-                    0.20000000298023224
+                    1.3877787807814457e-17
                 ],
                 "rotation": [
-                    -1.75,
-                    0.30000001192092896,
+                    -1.5499999523162842,
+                    1.3877787807814457e-17,
                     0.0
                 ],
                 "scale": [
@@ -78,7 +78,7 @@
     "scene_metadata": {
         "engine": "BBL Engine",
         "entity_count": 2,
-        "name": "Untitled Scene",
+        "name": "pointcloud",
         "version": "1.0"
     }
 }
