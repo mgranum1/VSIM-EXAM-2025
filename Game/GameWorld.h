@@ -21,7 +21,8 @@ public:
 
     Terrain* getTerrain() const { return m_terrain.get(); }
     bool isTerrainLoaded() const { return m_terrainLoaded; }
-    void setTerrainEntity(EntityID terrainID) {
+    void setTerrainEntity(EntityID terrainID)
+    {
         if (m_collisionSystem) {
             m_collisionSystem->setTerrainEntity(terrainID);
         }

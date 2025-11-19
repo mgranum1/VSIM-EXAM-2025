@@ -145,7 +145,8 @@ bool SceneSerializer::loadScene(EntityManager* entityManager,
 
                         // Regenerate terrain from heightmap so that we can load in terrain with the right heightmap
                         Terrain tempTerrain;
-                        if (tempTerrain.loadFromHeightmap(meshPath, 0.15f, 1.f, 0.0f)) {
+                        if (tempTerrain.loadFromOBJ(meshPath))
+                        {
 
                             bbl::MeshData terrainMeshData;
                             terrainMeshData.vertices = tempTerrain.getVertices();

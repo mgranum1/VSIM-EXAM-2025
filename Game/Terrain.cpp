@@ -1,5 +1,6 @@
 #include "../Game/Terrain.h"
 #include "../External/stb_image.h"
+#include "../Core/Utility/modelloader.h"
 #include <iostream>
 #include <cmath>
 #include <QDebug>
@@ -13,118 +14,58 @@ Terrain::~Terrain()
 {
 }
 
-
-bool Terrain::loadFromHeightmap(const std::string& filepath, float heightScale, float gridSpacing,float heightPlacement)
+bool Terrain::loadFromOBJ(const std::string& filepath)
 {
-    m_heightScale = heightScale;
-    m_gridSpacing = gridSpacing;
-    m_heightPlacement = heightPlacement;
-
-    stbi_uc* pixelData = stbi_load(filepath.c_str(), &m_width, &m_height, &m_channels, STBI_rgb_alpha);
-
-    if (pixelData == nullptr)
-    {
-        std::cerr << "Failed to load heightmap image: " << filepath << std::endl;
+    bbl::ModelLoader loader;
+    auto modelData = loader.loadModel(filepath);
+    if (!modelData || modelData->meshes.empty()) {
+        std::cerr << "Failed to load OBJ model: " << filepath << std::endl;
         return false;
     }
 
-    std::cout << "Loaded heightmap: " << m_width << "x" << m_height
-              << " (" << m_channels << " channels)" << std::endl;
+    // Clear previous data
+    m_vertices.clear();
+    m_indices.clear();
 
-    // Generate the mesh from pixel data
-    generateMesh(pixelData);
+    // For simplicity, assume the terrain is a single mesh
+    const auto& mesh = modelData->meshes[0];
 
-    // Free the image data
-    stbi_image_free(pixelData);
+    // Copy vertices
+    m_vertices.reserve(mesh.vertices.size());
+    for (const auto& v : mesh.vertices) {
+        m_vertices.push_back(v);
+    }
 
-    std::cout << "Terrain generated: " << m_vertices.size() << " vertices, "
-              << m_indices.size() << " indices" << std::endl;
+    // Copy indices
+    m_indices.reserve(mesh.indices.size());
+    for (auto index : mesh.indices) {
+        m_indices.push_back(index);
+    }
+
+    // Optional: recalculate normals if needed
+    calculateNormals();
+
+    // Store the min and max height for potential collision detection or other purposes
+    float minHeight = FLT_MAX;
+    float maxHeight = -FLT_MAX;
+    for (const auto& v : m_vertices) {
+        if (v.pos.y < minHeight) minHeight = v.pos.y;
+        if (v.pos.y > maxHeight) maxHeight = v.pos.y;
+    }
+    qDebug() << "Loaded OBJ terrain with heights from" << minHeight << "to" << maxHeight;
 
     return true;
 }
 
-
-void Terrain::generateMesh(unsigned char* textureData)
-{
-    m_vertices.clear();
-    m_indices.clear();
-    m_heightData.clear();
-
-    //Reserving space for vertices and heightData
-    m_vertices.reserve(m_width * m_height);
-    m_heightData.reserve(m_width * m_height);
-
-    float vertexXStart = 0.0f - m_width * m_gridSpacing / 2.0f;
-    float vertexZStart = 0.0f + m_height * m_gridSpacing / 2.0f;
-
-    for (int d = 0; d < m_height; ++d)
-    {
-        for (int w = 0; w < m_width; ++w)
-        {
-            //Calculating index for R in RGBA
-            int index = (w + d * m_width) * 4;
-
-            //Get Height from red Channel
-            float heightFromBitmap = static_cast<float>(textureData[index]) * m_heightScale + m_heightPlacement;
-
-            //Storing height for Collision Detection
-            m_heightData.push_back(heightFromBitmap);
-
-            Vertex vertex{};
-
-            //Position
-            vertex.pos = glm::vec3(vertexXStart+ (w * m_gridSpacing), heightFromBitmap, vertexZStart - (d * m_gridSpacing));
-
-            //Auto Coloring Will be replaced with texture
-            float normalizedHeight = (heightFromBitmap - m_heightPlacement) / (255.0f * m_heightScale);
-            vertex.color = glm::vec3(normalizedHeight, normalizedHeight * 0.8f, normalizedHeight * 0.6f);
-
-            vertex.texCoord = glm::vec2(w / (m_width - 1.0f),d / (m_height - 1.0f));
-
-            m_vertices.push_back(vertex);
-        }
-    }
-
-
-    //Making indices two triangles per quad
-    //Drawing the triangles from bottom left to top right
-    m_indices.reserve((m_width - 1) * (m_height - 1) * 6);
-
-    for (int d = 0; d < m_height - 1; ++d)
-    {
-        for (int w = 0; w < m_width - 1; ++w)
-        {
-            uint32_t topLeft = w + d * m_width;
-            uint32_t topRight = topLeft + 1;
-            uint32_t bottomLeft = topLeft + m_width;
-            uint32_t bottomRight = bottomLeft + 1;
-
-            // First triangle (top-left, bottom-right, bottom-left)
-            m_indices.push_back(topLeft);
-            m_indices.push_back(bottomRight);
-            m_indices.push_back(bottomLeft);
-
-            // Second triangle (top-left, top-right, bottom-right)
-            m_indices.push_back(topLeft);
-            m_indices.push_back(topRight);
-            m_indices.push_back(bottomRight);
-        }
-    }
-
-    calculateNormals();
-}
-
 void Terrain::calculateNormals()
 {
-
-    for (auto& vertex : m_vertices)
-    {
-        vertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    // Reset normals to zero
+    for (auto& vertex : m_vertices) {
+        vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Calculate normals for each triangle
-    for (size_t i = 0; i < m_indices.size(); i += 3)
-    {
+    for (size_t i = 0; i < m_indices.size(); i += 3) {
         uint32_t idx0 = m_indices[i];
         uint32_t idx1 = m_indices[i + 1];
         uint32_t idx2 = m_indices[i + 2];
@@ -142,15 +83,11 @@ void Terrain::calculateNormals()
         m_vertices[idx2].color += normal;
     }
 
-    // Normalize all normals
-    for (auto& vertex : m_vertices)
-    {
-        if (glm::length(vertex.color) > 0.0f)
-        {
+    // Normalize normals
+    for (auto& vertex : m_vertices) {
+        if (glm::length(vertex.color) > 0.0f) {
             vertex.color = glm::normalize(vertex.color);
-        }
-        else
-        {
+        } else {
             vertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
         }
     }
@@ -185,64 +122,54 @@ float Terrain::barycentric(const glm::vec2& p, const glm::vec3& a, const glm::ve
 
 float Terrain::getHeightAt(float worldX, float worldZ, const glm::vec3& terrainPosition) const
 {
-    if (m_vertices.empty() || m_heightData.empty())
+    if (m_vertices.empty() || m_indices.empty())
         return m_heightPlacement;
-
-    // Center the grid using the same offset as generateMesh()
-    float offsetX = -m_width * m_gridSpacing / 2.0f;
-    float offsetZ = +m_height * m_gridSpacing / 2.0f;
-
 
     float localWorldX = worldX - terrainPosition.x;
     float localWorldZ = worldZ - terrainPosition.z;
 
+    // Find the triangle that contains this point
+    for (size_t i = 0; i < m_indices.size(); i += 3) {
+        const auto& v0 = m_vertices[m_indices[i]];
+        const auto& v1 = m_vertices[m_indices[i + 1]];
+        const auto& v2 = m_vertices[m_indices[i + 2]];
 
-    float localX = localWorldX - offsetX;
-    float localZ = -(localWorldZ - offsetZ);
+        // Check if point is inside this triangle (using 2D projection)
+        if (isPointInTriangle(glm::vec2(localWorldX, localWorldZ),
+                              glm::vec2(v0.pos.x, v0.pos.z),
+                              glm::vec2(v1.pos.x, v1.pos.z),
+                              glm::vec2(v2.pos.x, v2.pos.z))) {
 
-
-    int gridX = static_cast<int>(std::floor(localX / m_gridSpacing));
-    int gridZ = static_cast<int>(std::floor(localZ / m_gridSpacing));
-
-    // Check bounds
-    if (gridX < 0 || gridZ < 0 || gridX >= m_width - 1 || gridZ >= m_height - 1) {
-
-        return m_heightPlacement;
+            // Calculate height using barycentric coordinates
+            return barycentric(glm::vec2(localWorldX, localWorldZ), v0.pos, v1.pos, v2.pos);
+        }
     }
 
-    // Get fractional
-    float xCoord = (localX / m_gridSpacing) - gridX;
-    float zCoord = (localZ / m_gridSpacing) - gridZ;
-
-
-    xCoord = glm::clamp(xCoord, 0.0f, 1.0f);
-    zCoord = glm::clamp(zCoord, 0.0f, 1.0f);
-
-    glm::vec3 a, b, c;
-    int topLeftIndex = gridX + gridZ * m_width;
-
-    // Determine which triangle we're in
-    if (xCoord + zCoord <= 1.0f)
-    {
-        // Upper-left triangle
-        a = m_vertices[topLeftIndex].pos;
-        b = m_vertices[topLeftIndex + 1].pos;
-        c = m_vertices[topLeftIndex + m_width].pos;
-    }
-    else
-    {
-        // Lower-right triangle
-        a = m_vertices[topLeftIndex + 1 + m_width].pos;
-        b = m_vertices[topLeftIndex + m_width].pos;
-        c = m_vertices[topLeftIndex + 1].pos;
-    }
-
-    float height = barycentric(glm::vec2(localWorldX, localWorldZ), a, b, c);
-
-    return height;
+    return m_heightPlacement; // Point not found in any triangle
 }
+
+bool Terrain::isPointInTriangle(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const
+{
+    // Using barycentric coordinates to check if point is inside triangle
+    glm::vec2 v0 = c - a;
+    glm::vec2 v1 = b - a;
+    glm::vec2 v2 = p - a;
+
+    float dot00 = glm::dot(v0, v0);
+    float dot01 = glm::dot(v0, v1);
+    float dot02 = glm::dot(v0, v2);
+    float dot11 = glm::dot(v1, v1);
+    float dot12 = glm::dot(v1, v2);
+
+    float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+    float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    return (u >= 0) && (v >= 0) && (u + v <= 1);
+}
+
 glm::vec3 Terrain::getCenter() const
 {
-    return glm::vec3(0.0f, 0.0f, 0.0f);  // Terrain is centered at origin
+    return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
