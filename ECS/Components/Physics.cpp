@@ -8,9 +8,9 @@ PhysicsSystem::PhysicsSystem(EntityManager* entityManager)
     : m_entityManager(entityManager)
 {
 
-    frictionCoefficient = 0.1f; // juster basert på hvor mye friksjon vi vil ha
+    frictionCoefficient = 0.2f; // juster basert på hvor mye friksjon vi vil ha
                                 // 0.1f for veldig glatt, 0.3f for vanlig, 0.7f for mye friksjon f. eks
-    zone_frictionCoefficient = 0.7f;
+    zone_frictionCoefficient = 1.f;
 
 }
 
@@ -143,7 +143,7 @@ glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const
     float normalForce = abs(glm::dot(-m_gravity, surfaceNormal));
 
     // Friksjonskraft = μ * N
-    float frictionMagnitude = frictionCoefficient * normalForce;
+    float frictionMagnitude = currentFriction * normalForce;
 
     // Returner friksjonskraften som akselerasjon (F = ma, så a = F/m, antatt m=1)
     return frictionDirection * frictionMagnitude;
@@ -300,7 +300,7 @@ float PhysicsSystem::getFrictionCoefficient() const
 float PhysicsSystem::getFrictionAtPosition(const glm::vec3& position)
 {
     // Ballens posisjon vil påvirke hvor mye friksjon som virker på den
-    float distanceFromCenter = glm::length(position - frictionCoefficient);
+    float distanceFromCenter = glm::length(position - zone_frictionCenter);
 
     if (distanceFromCenter <= zone_frictionRadius)
     {

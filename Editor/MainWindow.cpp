@@ -287,7 +287,7 @@ void MainWindow::onButton1Clicked()
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
         "../../Assets/Models/Ball2.obj",
         "../../Assets/Textures/Blue.jpg",
-        glm::vec3(380.0f, 200.0f, -305.0f)
+        glm::vec3(370.0f, 200.0f, -290.0f)
         );
 
     auto* entityManager = mVulkanWindow->getEntityManager();
