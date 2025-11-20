@@ -151,7 +151,8 @@ glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const
 
 int PhysicsSystem::findCurrentTriangle(const glm::vec3& position)
 {
-    if (!m_terrain) {
+    if (!m_terrain)
+    {
         return -1;
     }
 
@@ -217,7 +218,7 @@ bool PhysicsSystem::isPointInTriangle(const glm::vec3& point, const glm::vec3& v
         c = glm::vec2(v2.x, v2.y);
     }
 
-    // Barycentric koordinat test
+    // Barysentrisk koordinat test
     glm::vec2 v0_2d = c - a;
     glm::vec2 v1_2d = b - a;
     glm::vec2 v2_2d = p - a;
