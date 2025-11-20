@@ -254,7 +254,7 @@ void MainWindow::start()
 void MainWindow::on_action_Quit_triggered()
 {
     QMessageBox::StandardButton reply = QMessageBox::question(
-        this, "Quit INNgine", "Are you sure you want to quit?",
+        this, "Quit BBL engine", "Are you sure you want to quit?",
         QMessageBox::Yes | QMessageBox::No
         );
 
@@ -287,7 +287,7 @@ void MainWindow::onButton1Clicked()
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
         "../../Assets/Models/Ball2.obj",
         "../../Assets/Textures/Blue.jpg",
-        glm::vec3(400.0f, 200.0f, -305.0f)
+        glm::vec3(380.0f, 200.0f, -305.0f)
         );
 
     auto* entityManager = mVulkanWindow->getEntityManager();

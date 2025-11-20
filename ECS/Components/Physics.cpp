@@ -7,6 +7,10 @@ using namespace bbl;
 PhysicsSystem::PhysicsSystem(EntityManager* entityManager)
     : m_entityManager(entityManager)
 {
+
+    frictionCoefficient = 0.3f; // juster basert på hvor mye friksjon vi vil ha
+                                // 0.1f for veldig gladd, 0.3f for vanlig, 0.7f for mye friksjon f. eks
+
 }
 
 void PhysicsSystem::update(float dt)
@@ -39,7 +43,7 @@ void PhysicsSystem::update(float dt)
         }
         else
         {
-            // Bruk gravitet hvis det er påskrudd og entitien ikke er isGrounded
+            // Bruk gravitasjon hvis det er påskrudd og entitien ikke er isGrounded
             if (physics->useGravity && collision && !collision->isGrounded)
             {
                 physics->acceleration += m_gravity;
@@ -99,7 +103,14 @@ void PhysicsSystem::updateRollingPhysics(EntityID entity, float dt)
     glm::vec3 surfaceAcceleration = calculateSurfaceAcceleration(surfaceNormal);
 
     // Steg 4: Oppdater ballens hastighet (Algoritme 9.6, steg 4 - ligning 9.16)
-    physics->velocity += surfaceAcceleration * dt;
+    // Legger også til friksjon
+    glm::vec3 frictionForce = calculateFrictionForce(physics->velocity, surfaceNormal);
+
+    // Legger de to sammen
+    glm::vec3 totalAcceleration = surfaceAcceleration + frictionForce;
+
+    physics->velocity += totalAcceleration * dt;
+
 
     // Steg 5: Oppdater ballens posisjon (Algoritme 9.6, steg 5 - ligning 9.17)
     transform->position += physics->velocity * dt;
@@ -108,6 +119,31 @@ void PhysicsSystem::updateRollingPhysics(EntityID entity, float dt)
 
     // Tilbakestill akselerasjon for neste frame
     physics->acceleration = glm::vec3(0.0f);
+}
+
+glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal)
+{
+    // Beregn hastighet parallell med overflaten (fjern normal komponenten)
+    glm::vec3 velocityParallel = velocity - glm::dot(velocity, surfaceNormal) * surfaceNormal;
+
+    // Hvis objektet ikke beveger seg, ingen friksjon
+    float velocityMagnitude = glm::length(velocityParallel);
+    if (velocityMagnitude < 0.001f)
+    {
+        return glm::vec3(0.0f);
+    }
+
+    // Friksjonskraften virker i motsatt retning av bevegelsen
+    glm::vec3 frictionDirection = -glm::normalize(velocityParallel);
+
+    // Beregn normal kraften (komponent av gravitasjon vinkelrett på overflaten)
+    float normalForce = abs(glm::dot(-m_gravity, surfaceNormal));
+
+    // Friksjonskraft = μ * N
+    float frictionMagnitude = frictionCoefficient * normalForce;
+
+    // Returner friksjonskraften som akselerasjon (F = ma, så a = F/m, antatt m=1)
+    return frictionDirection * frictionMagnitude;
 }
 
 int PhysicsSystem::findCurrentTriangle(const glm::vec3& position)
@@ -237,10 +273,23 @@ glm::vec3 PhysicsSystem::calculateSurfaceAcceleration(const glm::vec3& normal)
     return gravityParallel;
 }
 
-void PhysicsSystem::setGravity(const glm::vec3& gravity) {
+
+void PhysicsSystem::setGravity(const glm::vec3& gravity)
+{
     m_gravity = gravity;
 }
 
-const glm::vec3& PhysicsSystem::getGravity() const {
+const glm::vec3& PhysicsSystem::getGravity() const
+{
     return m_gravity;
+}
+
+void PhysicsSystem::setFrictionCoefficient(float coefficient)
+{
+    frictionCoefficient = coefficient;
+}
+
+float PhysicsSystem::getFrictionCoefficient() const
+{
+    return frictionCoefficient;
 }
