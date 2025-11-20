@@ -34,7 +34,7 @@ void PhysicsSystem::update(float dt)
 
         if (useRollingPhysics)
         {
-            // Use the rolling ball physics from Algorithm 9.6
+            // Bruk rulling av ball fysikk fra Algoritme 9.6
             updateRollingPhysics(entity, dt);
         }
         else

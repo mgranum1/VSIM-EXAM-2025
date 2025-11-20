@@ -129,7 +129,7 @@ void Renderer::initVulkan() {
     //spawnModel("../../Assets/Models/PointcloudTriangulated_rotated.obj","../../Assets/Textures/pointcloud3.png", glm::vec3(0, 0, 0));
 
 
-    createTerrainEntity(&m_gameWorld);
+    //createTerrainEntity(&m_gameWorld);
 
     qDebug() << "How many entities in the scene?:" << entityManager->getEntityCount();
 
@@ -285,18 +285,16 @@ void Renderer::createTerrainEntity(bbl::GameWorld* gameWorld) {
         return;
     }
 
-    // Create MeshData from terrain
     bbl::MeshData terrainMeshData;
     terrainMeshData.vertices = vertices;
     terrainMeshData.indices = indices;
     terrainMeshData.materialIndex = -1;
 
-    // Create entity using new ECS system
     bbl::EntityID entity = entityManager->createEntityFromMesh(terrainMeshData, glm::vec3(0.0f));
 
     if (auto* meshComp = entityManager->getComponent<bbl::Mesh>(entity)) {
-        meshComp->modelPath = "../../Assets/Textures/heightmap.jpg";
-        meshComp->meshIndex = 0;  // Could store heightmap parameters here later
+        meshComp->modelPath = "../../Assets/Models/PointcloudTriangulated_Final.obj";
+        meshComp->meshIndex = 0;
     }
     // Add terrain texture
     size_t textureResourceID = GPUresources->uploadTexture("../../Assets/Textures/pointcloud3.png");

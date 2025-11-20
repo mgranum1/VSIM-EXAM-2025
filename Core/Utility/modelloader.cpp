@@ -190,7 +190,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                 vertex.texCoord = {0.0f, 0.0f};
             }
 
-            // Color from v x y z r g b   <--- this is your old ObjMesh behavior
+            // Color from v x y z r g b
             if (vi >= 0 && attrib.colors.size() > 3 * vi + 2) {
                 vertex.color = {
                     attrib.colors[3 * vi + 0],

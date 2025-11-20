@@ -298,11 +298,11 @@ void MainWindow::onButton1Clicked()
         entityManager->addComponent<bbl::Audio>(entityID, bbl::Audio{});
 
         if (sceneManager) {
-            sceneManager->setEntityName(entityID, "Rat_2.0");
+            sceneManager->setEntityName(entityID, "ball");
             sceneManager->markSceneDirty();
         }
 
-        qInfo() << "Spawned viking_room with EntityID:" << entityID;
+        qInfo() << "Spawned ball with EntityID:" << entityID;
     }
 
     mVulkanWindow->recreateSwapChain();
