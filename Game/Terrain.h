@@ -38,7 +38,7 @@ private:
     float m_gridSpacing;
     float m_heightPlacement;
 
-    bool isPointInTriangle(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const;
+    bool isPointInTriangleXZ(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const;
 
     std::vector<Vertex> m_vertices;
     std::vector<uint32_t> m_indices;

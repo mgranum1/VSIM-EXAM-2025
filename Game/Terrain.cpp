@@ -18,34 +18,31 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
 {
     bbl::ModelLoader loader;
     auto modelData = loader.loadModel(filepath);
-    if (!modelData || modelData->meshes.empty()) {
+    if (!modelData || modelData->meshes.empty())
+    {
         std::cerr << "Failed to load OBJ model: " << filepath << std::endl;
         return false;
     }
 
-    // Clear previous data
     m_vertices.clear();
     m_indices.clear();
 
-    // For simplicity, assume the terrain is a single mesh
     const auto& mesh = modelData->meshes[0];
 
-    // Copy vertices
     m_vertices.reserve(mesh.vertices.size());
     for (const auto& v : mesh.vertices) {
         m_vertices.push_back(v);
     }
 
-    // Copy indices
     m_indices.reserve(mesh.indices.size());
     for (auto index : mesh.indices) {
         m_indices.push_back(index);
     }
 
-    // Optional: recalculate normals if needed
+    // Rekalkuler normal hvis det skulle være nødvendig
     calculateNormals();
 
-    // Store the min and max height for potential collision detection or other purposes
+    // Lagre min og maks høyde for kollisjon handling
     float minHeight = FLT_MAX;
     float maxHeight = -FLT_MAX;
     for (const auto& v : m_vertices) {
@@ -59,12 +56,12 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
 
 void Terrain::calculateNormals()
 {
-    // Reset normals to zero
+    // Sett normaler til å være null
     for (auto& vertex : m_vertices) {
         vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
-    // Calculate normals for each triangle
+    // Kalkuler normaler for hver trekant
     for (size_t i = 0; i < m_indices.size(); i += 3) {
         uint32_t idx0 = m_indices[i];
         uint32_t idx1 = m_indices[i + 1];
@@ -83,7 +80,7 @@ void Terrain::calculateNormals()
         m_vertices[idx2].color += normal;
     }
 
-    // Normalize normals
+    // Normaliser normaler
     for (auto& vertex : m_vertices) {
         if (glm::length(vertex.color) > 0.0f) {
             vertex.color = glm::normalize(vertex.color);
@@ -128,29 +125,29 @@ float Terrain::getHeightAt(float worldX, float worldZ, const glm::vec3& terrainP
     float localWorldX = worldX - terrainPosition.x;
     float localWorldZ = worldZ - terrainPosition.z;
 
-    // Find the triangle that contains this point
+    // Find trekanten som inneholder dette punktet
     for (size_t i = 0; i < m_indices.size(); i += 3) {
         const auto& v0 = m_vertices[m_indices[i]];
         const auto& v1 = m_vertices[m_indices[i + 1]];
         const auto& v2 = m_vertices[m_indices[i + 2]];
 
-        // Check if point is inside this triangle (using 2D projection)
-        if (isPointInTriangle(glm::vec2(localWorldX, localWorldZ),
+        // Sjekk om punktet er inni triangelen med 2D projeksjon
+        if (isPointInTriangleXZ(glm::vec2(localWorldX, localWorldZ),
                               glm::vec2(v0.pos.x, v0.pos.z),
                               glm::vec2(v1.pos.x, v1.pos.z),
                               glm::vec2(v2.pos.x, v2.pos.z))) {
 
-            // Calculate height using barycentric coordinates
+            // Kalkuler høyden ved hjelp av barysentriske koordinater
             return barycentric(glm::vec2(localWorldX, localWorldZ), v0.pos, v1.pos, v2.pos);
         }
     }
 
-    return m_heightPlacement; // Point not found in any triangle
+    return m_heightPlacement; // Punktet er ikke funnet i noen trekant
 }
 
-bool Terrain::isPointInTriangle(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const
+bool Terrain::isPointInTriangleXZ(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const
 {
-    // Using barycentric coordinates to check if point is inside triangle
+    // Bruker barysentriske koordinater for å finne ut om punktet er innen for en trekant
     glm::vec2 v0 = c - a;
     glm::vec2 v1 = b - a;
     glm::vec2 v2 = p - a;
