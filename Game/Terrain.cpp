@@ -39,6 +39,7 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
         m_indices.push_back(index);
     }
 
+
     // Rekalkuler normal hvis det skulle være nødvendig
     calculateNormals();
 
@@ -169,4 +170,47 @@ glm::vec3 Terrain::getCenter() const
 {
     return glm::vec3(0.0f, 0.0f, 0.0f);
 }
+
+void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radius, const glm::vec3& zoneColor)
+{
+    for (auto& vertex : m_vertices)
+    {
+        float distance = glm::length(vertex.pos - zoneCenter);
+
+        if (distance <= radius)
+        {
+
+            vertex.color = glm::vec3(1.0f, 0.0f, 0.0f);
+        }
+        else
+        {
+            vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+    }
+}
+
+glm::vec3 Terrain::calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) const
+{
+    if (m_vertices.empty())
+    {
+        minBounds = maxBounds = glm::vec3(0.0f);
+        return glm::vec3(0.0f);
+    }
+
+    minBounds = maxBounds = m_vertices[0].pos;
+
+    for (const auto& vertex : m_vertices)
+    {
+        minBounds.x = std::min(minBounds.x, vertex.pos.x);
+        minBounds.y = std::min(minBounds.y, vertex.pos.y);
+        minBounds.z = std::min(minBounds.z, vertex.pos.z);
+
+        maxBounds.x = std::max(maxBounds.x, vertex.pos.x);
+        maxBounds.y = std::max(maxBounds.y, vertex.pos.y);
+        maxBounds.z = std::max(maxBounds.z, vertex.pos.z);
+    }
+
+    return (minBounds + maxBounds) * 0.5f; // Center point
+}
+
 

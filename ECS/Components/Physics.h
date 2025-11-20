@@ -24,14 +24,20 @@ public:
 
     void setFrictionCoefficient(float coefficient);
     float getFrictionCoefficient() const;
+    float getFrictionAtPosition(const glm::vec3& position);
+
+    float frictionCoefficient;
+    float zone_frictionCoefficient;
+    glm::vec3 zone_frictionCenter = glm::vec3(0.f, 0.f, 0.f);
+    float zone_frictionRadius = 5.0f;
 
 private:
     EntityManager* m_entityManager;
     Terrain* m_terrain = nullptr;
     glm::vec3 m_gravity{0.0f, -9.81f, 0.0f};
-    float frictionCoefficient;
+
     bool m_rollingPhysicsEnabled = false;
-    glm::vec3 calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal);
+    glm::vec3 calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal, const glm::vec3 &position);
 
     // Rolling physics methods
     void updateRollingPhysics(EntityID entity, float dt);

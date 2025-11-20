@@ -8,11 +8,12 @@ layout(location = 3) in vec3 lightPos;
 layout(location = 4) in vec3 viewPos;
 layout(location = 5) in vec3 lightDir;
 layout(location = 6) in float lightIntensity;
+layout(location = 7) in vec3 inColor;
 
 void main()
 {
     bool blinn = true;
-    vec3 color = texture(texSampler, inTexCoord).rgb;
+    vec3 color = texture(texSampler, inTexCoord).rgb + inColor;
 
 
     vec3 lightDirection = normalize(lightDir);

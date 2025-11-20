@@ -8,8 +8,9 @@ PhysicsSystem::PhysicsSystem(EntityManager* entityManager)
     : m_entityManager(entityManager)
 {
 
-    frictionCoefficient = 0.3f; // juster basert på hvor mye friksjon vi vil ha
-                                // 0.1f for veldig gladd, 0.3f for vanlig, 0.7f for mye friksjon f. eks
+    frictionCoefficient = 0.1f; // juster basert på hvor mye friksjon vi vil ha
+                                // 0.1f for veldig glatt, 0.3f for vanlig, 0.7f for mye friksjon f. eks
+    zone_frictionCoefficient = 0.7f;
 
 }
 
@@ -103,8 +104,8 @@ void PhysicsSystem::updateRollingPhysics(EntityID entity, float dt)
     glm::vec3 surfaceAcceleration = calculateSurfaceAcceleration(surfaceNormal);
 
     // Steg 4: Oppdater ballens hastighet (Algoritme 9.6, steg 4 - ligning 9.16)
-    // Legger også til friksjon
-    glm::vec3 frictionForce = calculateFrictionForce(physics->velocity, surfaceNormal);
+    // Legger også til friksjon, samt sjekker posisjonen til ballen for å oppdatere friksjon
+    glm::vec3 frictionForce = calculateFrictionForce(physics->velocity, surfaceNormal, transform->position);
 
     // Legger de to sammen
     glm::vec3 totalAcceleration = surfaceAcceleration + frictionForce;
@@ -121,7 +122,7 @@ void PhysicsSystem::updateRollingPhysics(EntityID entity, float dt)
     physics->acceleration = glm::vec3(0.0f);
 }
 
-glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal)
+glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal, const glm::vec3& position)
 {
     // Beregn hastighet parallell med overflaten (fjern normal komponenten)
     glm::vec3 velocityParallel = velocity - glm::dot(velocity, surfaceNormal) * surfaceNormal;
@@ -132,6 +133,8 @@ glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const
     {
         return glm::vec3(0.0f);
     }
+
+    float currentFriction = getFrictionAtPosition(position);
 
     // Friksjonskraften virker i motsatt retning av bevegelsen
     glm::vec3 frictionDirection = -glm::normalize(velocityParallel);
@@ -291,5 +294,18 @@ void PhysicsSystem::setFrictionCoefficient(float coefficient)
 
 float PhysicsSystem::getFrictionCoefficient() const
 {
+    return frictionCoefficient;
+}
+
+float PhysicsSystem::getFrictionAtPosition(const glm::vec3& position)
+{
+    // Ballens posisjon vil påvirke hvor mye friksjon som virker på den
+    float distanceFromCenter = glm::length(position - frictionCoefficient);
+
+    if (distanceFromCenter <= zone_frictionRadius)
+    {
+        return zone_frictionCoefficient;
+    }
+
     return frictionCoefficient;
 }

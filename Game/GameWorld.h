@@ -30,6 +30,8 @@ public:
 
     void initializeSystems(EntityManager* entityManager);
 
+    void setupFrictionZone();
+
 private:
     std::unique_ptr<Terrain> m_terrain;
     std::unique_ptr<PhysicsSystem> m_physicsSystem;

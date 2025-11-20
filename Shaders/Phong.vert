@@ -16,6 +16,7 @@ layout(push_constant) uniform PushConstants {
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
+layout (location = 3) in vec3 aColor;
 
 layout(location = 0) out vec3 outPos;
 layout(location = 1) out vec3 outNormal;
@@ -24,6 +25,7 @@ layout(location = 3) out vec3 outLightPos;
 layout(location = 4) out vec3 outViewPos;
 layout(location = 5) out vec3 outLightDir;
 layout(location = 6) out float outLightIntensity;
+layout(location = 7) out vec3 outColor;
 
 void main()
 {
@@ -40,6 +42,7 @@ void main()
     outViewPos = ubo.viewPos;
     outLightDir = ubo.lightDir;
     outLightIntensity = ubo.lightIntensity;
+    outColor = aColor;
 
     gl_Position = ubo.proj * ubo.view * worldPos;
 }

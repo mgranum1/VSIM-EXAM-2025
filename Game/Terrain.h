@@ -26,6 +26,9 @@ public:
     float getGridSpacing() const { return m_gridSpacing; }
     glm::vec3 getCenter() const;
 
+    void applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radius, const glm::vec3& zoneColor);
+    glm::vec3 calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) const;
+
 private:
     void calculateNormals();
     float barycentric(const glm::vec2& p, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) const;
