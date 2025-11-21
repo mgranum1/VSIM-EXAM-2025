@@ -142,6 +142,7 @@
         VkPipeline graphicsPipeline;
         VkPipeline phongPipeline;
         VkPipeline pointPipeline;
+        VkPipeline linePipeline;
 
         VkCommandPool commandPool;
 

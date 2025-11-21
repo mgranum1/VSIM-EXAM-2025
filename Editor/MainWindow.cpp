@@ -389,6 +389,7 @@ void MainWindow::onSceneObjectSelected(QListWidgetItem* item)
         renderFields["Visible"] = render->visible;
         renderFields["Use Phong"] = render->usePhong;
         renderFields["Use Points"] = render->usePoint;
+        renderFields["Use Lines"] = render->useLine;
         addComponentUI("Render Component", renderFields);
         componentCount++;
     }
@@ -622,6 +623,8 @@ void MainWindow::addComponentToEntity(const QString& componentName)
             newRender.textureResourceID = 0;
             newRender.visible = true;
             newRender.usePhong = false;
+            newRender.usePoint = false;
+            newRender.useLine = false;
 
             entityManager->addComponent(entityID, newRender);
             added = true;
@@ -872,12 +875,21 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
                             if (!em) return;
                             auto* render = em->getComponent<bbl::Render>(entityID);
                             if (!render) {return;}
-                            if (field == "Visible") {
+                            if (field == "Visible")
+                            {
                                 render->visible = valid;
-                            } else if (field == "Use Phong") {
+                            }
+                            else if (field == "Use Phong")
+                            {
                                 render->usePhong = valid;
-                            } else if (field == "Use Points") {
+                            }
+                            else if (field == "Use Points")
+                            {
                                 render->usePoint = valid;
+                            }
+                            else if (field == "Use Lines")
+                            {
+                                render->useLine = valid;
                             }
                             mVulkanWindow->recreateSwapChain();
                             mVulkanWindow->requestUpdate();

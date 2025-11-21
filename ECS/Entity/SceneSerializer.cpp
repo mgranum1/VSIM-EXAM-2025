@@ -376,6 +376,7 @@ json SceneSerializer::serializeRender(const Render& render)
         {"visible", render.visible},
         {"usePhong", render.usePhong},
         {"usePoint", render.usePoint},
+        {"useLine", render.useLine},
         {"opacity", render.opacity}
     };
 }
@@ -450,6 +451,7 @@ Render SceneSerializer::deserializeRender(const json& j)
     render.visible = j["visible"].get<bool>();
     render.usePhong = j["usePhong"].get<bool>();
     render.usePoint = j["usePoint"].get<bool>();
+    render.useLine = j["useLine"].get<bool>();
     render.opacity = j["opacity"].get<float>();
     return render;
 }

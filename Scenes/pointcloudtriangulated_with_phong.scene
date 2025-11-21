@@ -10,6 +10,7 @@
                 "meshResourceID": 0,
                 "opacity": 1.0,
                 "textureResourceID": 1,
+                "useLine": false,
                 "usePhong": false,
                 "usePoint": false,
                 "visible": true
@@ -20,13 +21,13 @@
             },
             "Transform": {
                 "position": [
-                    -7.0,
-                    300.0,
-                    0.0
+                    -13.600000381469727,
+                    300.25,
+                    -0.10000000149011612
                 ],
                 "rotation": [
-                    -0.5,
-                    0.6000000238418579,
+                    -0.6499999761581421,
+                    0.8500000238418579,
                     0.10000000149011612
                 ],
                 "scale": [
@@ -47,6 +48,7 @@
                 "meshResourceID": 1,
                 "opacity": 1.0,
                 "textureResourceID": 2,
+                "useLine": false,
                 "usePhong": true,
                 "usePoint": false,
                 "visible": true
@@ -76,13 +78,13 @@
         }
     ],
     "entity_names": {
-        "1": "Ball2",
+        "1": "Sun",
         "2": "PointcloudTriangulated_rotated"
     },
     "scene_metadata": {
         "engine": "BBL Engine",
         "entity_count": 2,
-        "name": "Untitled Scene",
+        "name": "pointcloudtriangulated_with_phong",
         "version": "1.0"
     }
 }

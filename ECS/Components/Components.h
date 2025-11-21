@@ -75,6 +75,7 @@ struct Render
     bool visible{true};
     bool usePhong{false};
     bool usePoint{false};
+    bool useLine{false};
     float opacity{1.0f};
 };
 

@@ -12,6 +12,7 @@
                 "textureResourceID": 1,
                 "usePhong": false,
                 "usePoint": false,
+		"useLine": false,
                 "visible": false
             },
             "Texture": {
@@ -49,6 +50,7 @@
                 "textureResourceID": 0,
                 "usePhong": false,
                 "usePoint": true,
+		"useLine": false,
                 "visible": true
             },
             "Transform": {

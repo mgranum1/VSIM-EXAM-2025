@@ -92,6 +92,7 @@ void Renderer::initVulkan() {
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
     createCommandPool();
     createColorResources();
     createDepthResources();
@@ -468,6 +469,7 @@ void Renderer::recreateSwapChain() {
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
     createColorResources();
     createDepthResources();
     createFramebuffers();
@@ -1788,13 +1790,19 @@ void Renderer::createCommandBuffers() {
             uint32_t dynamicOffset = static_cast<uint32_t>(entityIndex * alignedUniformSize);
 
             // Always bind descriptor set (regardless of visibility, this is for convenience sake)
-            if (renderComp->usePhong == true) {
+            if (renderComp->usePhong == true)
+            {
                 vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, phongPipeline);
             }
 
             else if (renderComp->usePoint == true)
             {
                 vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pointPipeline);
+            }
+
+            else if (renderComp->useLine == true)
+            {
+                vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, linePipeline);
             }
 
             else

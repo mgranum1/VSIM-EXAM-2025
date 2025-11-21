@@ -23,6 +23,7 @@
                 "textureResourceID": 0,
                 "usePhong": false,
                 "usePoint": false,
+		"useLine": false,
                 "visible": true
             },
             "Texture": {
@@ -71,6 +72,7 @@
                 "textureResourceID": 0,
                 "usePhong": false,
                 "usePoint": false,
+		"useLine": false,
                 "visible": true
             },
             "Texture": {
@@ -119,6 +121,7 @@
                 "textureResourceID": 0,
                 "usePhong": false,
                 "usePoint": false,
+		"useLine": false,
                 "visible": true
             },
             "Texture": {
@@ -156,6 +159,7 @@
                 "textureResourceID": 1,
                 "usePhong": false,
                 "usePoint": false,
+		"useLine": false,
                 "visible": true
             },
             "Texture": {
