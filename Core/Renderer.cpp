@@ -133,8 +133,6 @@ void Renderer::initVulkan() {
     //     spawnModel("../../Assets/Models/cube.obj","../../Assets/Textures/notexture.jpg", glm::vec3(300, 100, -250 + (i * 5)));
     // }
 
-
-
     //createTerrainEntity(&m_gameWorld);
 
     qDebug() << "How many entities in the scene?:" << entityManager->getEntityCount();

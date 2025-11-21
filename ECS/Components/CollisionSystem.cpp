@@ -168,17 +168,29 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
 
     // Oppgave 2.4 - Håndtering av statiske objekter
 
+    // Kapitell 9.7 kollisjoner - 9.7.1 kollisjon mellom ball - veg
+
     // Håndtering av statiske objecter
     bool staticA = collisionA->isStatic;
     bool staticB = collisionB->isStatic;
 
-    if (staticA && staticB) {
+    if (staticA && staticB)
+    {
         return; // Begge statiske - ingen bevegelse
-        } else if (staticA && !staticB) {
+    }
+
+    else if (staticA && !staticB)
+    {
         transformB->position += separation; // Kun B flytter seg
-    } else if (!staticA && staticB) {
+    }
+
+    else if (!staticA && staticB)
+    {
         transformA->position -= separation; // Kun A flytter seg
-    } else {
+    }
+
+    else
+    {
         // Begge dynamiske - del seperasjonen
         transformA->position -= separation * 0.5f;
         transformB->position += separation * 0.5f;
@@ -188,15 +200,18 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
     Physics* physicsA = m_entityManager->getComponent<Physics>(entityA);
     Physics* physicsB = m_entityManager->getComponent<Physics>(entityB);
 
-    if (glm::length(separation) > 0.0f) {
+    if (glm::length(separation) > 0.0f)
+    {
         glm::vec3 normal = glm::normalize(separation);
 
-        if (!staticA && physicsA) {
+        if (!staticA && physicsA)
+        {
             float velA = glm::dot(physicsA->velocity, normal);
             if (velA < 0.0f) physicsA->velocity -= normal * velA;
         }
 
-        if (!staticB && physicsB) {
+        if (!staticB && physicsB)
+        {
             float velB = glm::dot(physicsB->velocity, normal);
             if (velB > 0.0f) physicsB->velocity -= normal * velB;
         }
