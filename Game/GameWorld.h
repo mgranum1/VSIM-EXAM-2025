@@ -18,6 +18,8 @@ public:
     void Setup();
     void update(float dt);
 
+    void setPaused(bool paused) { mPaused = paused; }
+    bool isPaused() const { return mPaused; }
 
     Terrain* getTerrain() const { return m_terrain.get(); }
     bool isTerrainLoaded() const { return m_terrainLoaded; }
@@ -38,6 +40,7 @@ private:
     std::unique_ptr<CollisionSystem> m_collisionSystem;
 
     bool m_terrainLoaded{false};
+    bool mPaused{true};
 };
 
 } // namespace bbl

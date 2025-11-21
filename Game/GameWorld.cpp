@@ -78,6 +78,11 @@ void bbl::GameWorld::initializeSystems(EntityManager* entityManager)
 
 void bbl::GameWorld::update(float dt)
 {
+    if (mPaused)
+    {
+        return;
+    }
+
     if (m_collisionSystem) {
         m_collisionSystem->update(dt);
     }

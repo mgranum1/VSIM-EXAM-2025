@@ -1123,9 +1123,17 @@ void MainWindow::messageHandler(QtMsgType type, const QMessageLogContext& contex
 
 void MainWindow::onPlayToggled()
 {
+    auto* gWorld = mVulkanWindow->getGameWorld();
+
     isPlaying = !isPlaying;
     playButton->setText(isPlaying ? "⏹ Stop" : "▶ Play");
     playButton->setStyleSheet(playButtonStyle(isPlaying));
+
+    if(gWorld)
+    {
+        gWorld->setPaused(!isPlaying);
+    }
+
     qInfo() << (isPlaying ? "Play mode started." : "Play mode stopped.");
 }
 
