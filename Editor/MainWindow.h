@@ -7,7 +7,18 @@
 #include <QPushButton>
 #include <QListWidget>
 #include <qboxlayout.h>
-
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QGroupBox>
+#include <QFormLayout>
+#include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QScrollArea>
+#include <QTabWidget>
+#include <QSplitter>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include "../Game/GameWorld.h"
 
 // Forward declarations
@@ -17,7 +28,7 @@ class Renderer;
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
-    class MainWindow;
+class MainWindow;
 }
 QT_END_NAMESPACE
 
@@ -50,24 +61,31 @@ private:
     // UI Components
     //=========================================================================
     QPushButton* playButton = nullptr;
+    QPushButton* addComponentButton = nullptr;  // Component management button
     bool isPlaying = false;
-    void updateSceneObjectList();
     int selectedEntityIndex = -1;
+
+    // UI Widgets
+    QListWidget* sceneObjectList = nullptr;
+    QListWidget* componentList = nullptr;
+    QWidget* componentPanelWidget = nullptr;
+    QVBoxLayout* componentLayout = nullptr;
+
     //=========================================================================
     // Initialization Helpers
     //=========================================================================
     void initRenderer();
     void initUI();
     void initLogger();
-
     QWidget* createTopBar();
     QTabWidget* createTabWidget();
     QWidget* createRightPanel();
     QString playButtonStyle(bool playing) const;
-    QListWidget* sceneObjectList;
-    QListWidget* componentList;
-    QWidget* componentPanelWidget = nullptr;
-    QVBoxLayout* componentLayout = nullptr;
+
+    //=========================================================================
+    // Helper Functions
+    //=========================================================================
+    void updateSceneObjectList();
 
     //=========================================================================
     // Logger
@@ -89,12 +107,21 @@ private slots:
     void onButton2Clicked();
 
     //=========================================================================
-    // UI Clicked
+    // UI Interactions
     //=========================================================================
     void onSceneObjectSelected(QListWidgetItem* item);
     void addComponentUI(const QString& name, const QVariantMap& fields);
 
-    //For Saving and Loading Scenes
+    //=========================================================================
+    // Component Management
+    //=========================================================================
+    void showAddComponentDialog();
+    void addComponentToEntity(const QString& componentName);
+    void removeComponentFromEntity(const QString& componentName);
+
+    //=========================================================================
+    // Scene Management
+    //=========================================================================
     void on_action_SaveScene_triggered();
     void on_action_SaveSceneAs_triggered();
     void on_action_LoadScene_triggered();

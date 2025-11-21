@@ -1,0 +1,197 @@
+{
+    "entities": [
+        {
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": false,
+                "isGrounded": false,
+                "isStatic": true,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 0,
+                "modelPath": "../../Assets/Models/cube.obj"
+            },
+            "Render": {
+                "meshResourceID": 0,
+                "opacity": 1.0,
+                "textureResourceID": 0,
+                "usePhong": false,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/notexture.jpg",
+                "textureResourceID": 0
+            },
+            "Transform": {
+                "position": [
+                    300.0,
+                    106.82164764404297,
+                    -258.8999938964844
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 1
+        },
+        {
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": true,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 1,
+                "modelPath": "../../Assets/Models/cube.obj"
+            },
+            "Render": {
+                "meshResourceID": 1,
+                "opacity": 1.0,
+                "textureResourceID": 0,
+                "usePhong": false,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/notexture.jpg",
+                "textureResourceID": 0
+            },
+            "Transform": {
+                "position": [
+                    300.20001220703125,
+                    103.36363220214844,
+                    -241.1999969482422
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 2
+        },
+        {
+            "Collision": {
+                "colliderSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "isColliding": true,
+                "isGrounded": true,
+                "isStatic": true,
+                "isTrigger": false
+            },
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 2,
+                "modelPath": "../../Assets/Models/cube.obj"
+            },
+            "Render": {
+                "meshResourceID": 2,
+                "opacity": 1.0,
+                "textureResourceID": 0,
+                "usePhong": false,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/notexture.jpg",
+                "textureResourceID": 0
+            },
+            "Transform": {
+                "position": [
+                    313.1499938964844,
+                    98.38853454589844,
+                    -230.14999389648438
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 3
+        },
+        {
+            "Mesh": {
+                "meshIndex": 0,
+                "meshResourceID": 3,
+                "modelPath": "../../Assets/Models/PointcloudTriangulated_Final.obj"
+            },
+            "Render": {
+                "meshResourceID": 3,
+                "opacity": 1.0,
+                "textureResourceID": 1,
+                "usePhong": false,
+                "usePoint": false,
+                "visible": true
+            },
+            "Texture": {
+                "texturePath": "../../Assets/Textures/pointcloud3.png",
+                "textureResourceID": 1
+            },
+            "Transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "entity_id": 4
+        }
+    ],
+    "entity_names": {
+        "1": "cube",
+        "2": "cube",
+        "3": "cube",
+        "4": "Terrain"
+    },
+    "scene_metadata": {
+        "engine": "BBL Engine",
+        "entity_count": 4,
+        "name": "Untitled Scene",
+        "version": "1.0"
+    }
+}

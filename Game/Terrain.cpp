@@ -14,6 +14,7 @@ Terrain::~Terrain()
 {
 }
 
+// Laste inn punktsky data
 bool Terrain::loadFromOBJ(const std::string& filepath)
 {
     bbl::ModelLoader loader;

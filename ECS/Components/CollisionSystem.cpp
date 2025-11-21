@@ -146,10 +146,8 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
     glm::vec3 centerA = transformA->position;
     glm::vec3 centerB = transformB->position;
     glm::vec3 delta = centerB - centerA;
-
     Collision* collisionA = m_entityManager->getComponent<Collision>(entityA);
     Collision* collisionB = m_entityManager->getComponent<Collision>(entityB);
-
     glm::vec3 halfSizeA = collisionA->colliderSize * 0.5f * transformA->scale;
     glm::vec3 halfSizeB = collisionB->colliderSize * 0.5f * transformB->scale;
     glm::vec3 totalHalfSize = halfSizeA + halfSizeB;
@@ -159,36 +157,48 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
     float overlapY = totalHalfSize.y - std::abs(delta.y);
     float overlapZ = totalHalfSize.z - std::abs(delta.z);
 
-
     glm::vec3 separation(0.0f);
-
     if (overlapX < overlapY && overlapX < overlapZ) {
-
         separation.x = (delta.x > 0) ? overlapX : -overlapX;
     } else if (overlapY < overlapZ) {
-
         separation.y = (delta.y > 0) ? overlapY : -overlapY;
     } else {
-        // Separate on Z axis
         separation.z = (delta.z > 0) ? overlapZ : -overlapZ;
     }
 
-    //push the entitys apart
-    transformA->position -= separation * 0.5f;
-    transformB->position += separation * 0.5f;
+    // Oppgave 2.4 - Håndtering av statiske objekter
 
-    // Stop their velocities in the collision direction
+    // Håndtering av statiske objecter
+    bool staticA = collisionA->isStatic;
+    bool staticB = collisionB->isStatic;
+
+    if (staticA && staticB) {
+        return; // Begge statiske - ingen bevegelse
+        } else if (staticA && !staticB) {
+        transformB->position += separation; // Kun B flytter seg
+    } else if (!staticA && staticB) {
+        transformA->position -= separation; // Kun A flytter seg
+    } else {
+        // Begge dynamiske - del seperasjonen
+        transformA->position -= separation * 0.5f;
+        transformB->position += separation * 0.5f;
+    }
+
+    // Håndter hastighetsendringer - kun for ikke-statiske objekter
     Physics* physicsA = m_entityManager->getComponent<Physics>(entityA);
     Physics* physicsB = m_entityManager->getComponent<Physics>(entityB);
 
-    if (physicsA && physicsB) {
+    if (glm::length(separation) > 0.0f) {
         glm::vec3 normal = glm::normalize(separation);
 
-        // Remove velocity component along collision normal
-        float velA = glm::dot(physicsA->velocity, normal);
-        float velB = glm::dot(physicsB->velocity, normal);
+        if (!staticA && physicsA) {
+            float velA = glm::dot(physicsA->velocity, normal);
+            if (velA < 0.0f) physicsA->velocity -= normal * velA;
+        }
 
-        if (velA < 0.0f) physicsA->velocity -= normal * velA;
-        if (velB > 0.0f) physicsB->velocity -= normal * velB;
+        if (!staticB && physicsB) {
+            float velB = glm::dot(physicsB->velocity, normal);
+            if (velB > 0.0f) physicsB->velocity -= normal * velB;
+        }
     }
 }

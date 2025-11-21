@@ -128,6 +128,12 @@ void Renderer::initVulkan() {
     //Adding the point cloud
     //spawnModel("../../Assets/Models/PointcloudTriangulated_rotated.obj","../../Assets/Textures/pointcloud3.png", glm::vec3(0, 0, 0));
 
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     spawnModel("../../Assets/Models/cube.obj","../../Assets/Textures/notexture.jpg", glm::vec3(300, 100, -250 + (i * 5)));
+    // }
+
+
 
     //createTerrainEntity(&m_gameWorld);
 
