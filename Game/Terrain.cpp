@@ -172,6 +172,7 @@ glm::vec3 Terrain::getCenter() const
     return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
+// Skravere området rødt hvor det er ekstra mye friksjon
 void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radius, const glm::vec3& zoneColor)
 {
     for (auto& vertex : m_vertices)
@@ -190,6 +191,7 @@ void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radiu
     }
 }
 
+// Brukes for å sette et friksjons område, tar inn hele terrainet
 glm::vec3 Terrain::calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) const
 {
     if (m_vertices.empty())
