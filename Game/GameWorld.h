@@ -5,7 +5,7 @@
 #include "../ECS/Components/Physics.h"
 #include "../ECS/Components/CollisionSystem.h"
 #include "../ECS/Entity/EntityManager.h"
-#include "../ECS/trackingsystemclass.h"
+#include "../ECS/Components/trackingsystemclass.h"
 #include <memory>
 
 class Renderer;
