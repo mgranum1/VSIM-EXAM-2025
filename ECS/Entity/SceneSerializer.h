@@ -44,6 +44,7 @@ private:
     json serializeAudio(const Audio& audio);
     json serializePhysics(const Physics& physics);
     json serializeCollision(const Collision& collision);
+    static json serializeTracking(const Tracking& tracking);
 
     Transform deserializeTransform(const json& j);
     Mesh deserializeMesh(const json& j);
@@ -52,6 +53,7 @@ private:
     Audio deserializeAudio(const json& j);
     Physics deserializePhysics(const json& j);
     Collision deserializeCollision(const json& j);
+    static Tracking deserializeTracking(const json& j);
 
 
     json serializeEntity(const EntityManager* entityManager, EntityID entityID);

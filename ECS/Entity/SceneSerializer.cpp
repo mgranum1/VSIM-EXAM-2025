@@ -295,6 +295,12 @@ json SceneSerializer::serializeEntity(const EntityManager* entityManager, Entity
         entityJson["Collision"] = serializeCollision(*comp);
     }
 
+    // Add Tracking component serialization
+    if (entityManager->hasComponent<Tracking>(entityID)) {
+        const auto* comp = entityManager->getComponent<Tracking>(entityID);
+        entityJson["Tracking"] = serializeTracking(*comp);
+    }
+
     return entityJson;
 }
 
@@ -339,6 +345,12 @@ void SceneSerializer::deserializeEntity(EntityManager* entityManager, const json
     if (entityJson.contains("Collision")) {
         Collision collision = deserializeCollision(entityJson["Collision"]);
         entityManager->addComponent(newEntity, collision);
+    }
+
+    // Add Tracking component deserialization
+    if (entityJson.contains("Tracking")) {
+        Tracking tracking = deserializeTracking(entityJson["Tracking"]);
+        entityManager->addComponent(newEntity, tracking);
     }
 }
 
@@ -410,6 +422,32 @@ json SceneSerializer::serializeCollision(const Collision& collision)
         {"isColliding", collision.isColliding},
         {"isTrigger", collision.isTrigger},
         {"isStatic", collision.isStatic}
+    };
+}
+
+// Add Tracking serialization
+json SceneSerializer::serializeTracking(const Tracking& tracking)
+{
+    json controlPointsArray = json::array();
+    for (const auto& point : tracking.controlPoints) {
+        controlPointsArray.push_back({point.x, point.y, point.z});
+    }
+
+    json curvePointsArray = json::array();
+    for (const auto& point : tracking.curvePoints) {
+        curvePointsArray.push_back({point.x, point.y, point.z});
+    }
+
+    return {
+        {"samplingInterval", tracking.samplingInterval},
+        {"maxControlPoints", tracking.maxControlPoints},
+        {"curveResolution", tracking.curveResolution},
+        {"isTracking", tracking.isTracking},
+        {"traceColor", {tracking.traceColor.r, tracking.traceColor.g, tracking.traceColor.b}},
+        {"lineWidth", tracking.lineWidth},
+        {"controlPoints", controlPointsArray},
+        {"curvePoints", curvePointsArray}
+        // Note: lastSampleTime is not serialized as it will be reset when the component is loaded
     };
 }
 
@@ -494,4 +532,41 @@ Collision SceneSerializer::deserializeCollision(const json& j)
 
     return collision;
 }
+
+// Add Tracking deserialization
+Tracking SceneSerializer::deserializeTracking(const json& j)
+{
+    Tracking tracking;
+
+    tracking.samplingInterval = j["samplingInterval"].get<float>();
+    tracking.maxControlPoints = j["maxControlPoints"].get<size_t>();
+    tracking.curveResolution = j["curveResolution"].get<size_t>();
+    tracking.isTracking = j["isTracking"].get<bool>();
+    tracking.lineWidth = j["lineWidth"].get<float>();
+
+    auto color = j["traceColor"];
+    tracking.traceColor = glm::vec3(color[0], color[1], color[2]);
+
+    // Deserialize control points
+    if (j.contains("controlPoints")) {
+        tracking.controlPoints.clear();
+        for (const auto& pointJson : j["controlPoints"]) {
+            tracking.controlPoints.emplace_back(pointJson[0], pointJson[1], pointJson[2]);
+        }
+    }
+
+    // Deserialize curve points
+    if (j.contains("curvePoints")) {
+        tracking.curvePoints.clear();
+        for (const auto& pointJson : j["curvePoints"]) {
+            tracking.curvePoints.emplace_back(pointJson[0], pointJson[1], pointJson[2]);
+        }
+    }
+
+    // Reset lastSampleTime to current time
+    tracking.lastSampleTime = std::chrono::steady_clock::now();
+
+    return tracking;
+}
+
 }

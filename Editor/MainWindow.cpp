@@ -320,7 +320,7 @@ void MainWindow::onButton1Clicked()
         {
             gameWorld->getTrackingSystem()->enableTracking(
                 entityID,
-                0.05f, // Sampler hvert 50ms
+                0.5f, // Sampler hvert 500ms
                 glm::vec3(1.0f, 0.0f, 0.0f) // Setter fargen på tracen, fungerer ikke helt optimalt
                 );
         }
@@ -466,6 +466,25 @@ void MainWindow::onSceneObjectSelected(QListWidgetItem* item)
         componentCount++;
     }
 
+    // Check for Tracking component
+    if (entityManager->hasComponent<bbl::Tracking>(selectedEntityID)) {
+        const auto& tracking = entityManager->getComponent<bbl::Tracking>(selectedEntityID);
+        QVariantMap trackingFields;
+        trackingFields["Is Tracking"] = tracking->isTracking;
+        trackingFields["Sampling Interval"] = tracking->samplingInterval;
+        trackingFields["Max Control Points"] = static_cast<int>(tracking->maxControlPoints);
+        trackingFields["Curve Resolution"] = static_cast<int>(tracking->curveResolution);
+        trackingFields["Line Width"] = tracking->lineWidth;
+        trackingFields["Trace Color R"] = tracking->traceColor.r;
+        trackingFields["Trace Color G"] = tracking->traceColor.g;
+        trackingFields["Trace Color B"] = tracking->traceColor.b;
+        trackingFields["Control Points Count"] = static_cast<int>(tracking->controlPoints.size());
+        trackingFields["Curve Points Count"] = static_cast<int>(tracking->curvePoints.size());
+        addComponentUI("Tracking Component", trackingFields);
+        componentCount++;
+    }
+
+
     // Get entity name for logging
     const auto& entityNames = mVulkanWindow->getEntityNames();
     auto nameIt = entityNames.find(selectedEntityID);
@@ -525,6 +544,11 @@ void MainWindow::showAddComponentDialog()
     if (!entityManager->hasComponent<bbl::Mesh>(entityID))
     {
         availableComponents << "Mesh Component";
+    }
+
+    if (!entityManager->hasComponent<bbl::Tracking>(entityID))
+    {
+        availableComponents << "Tracking Component";
     }
 
     if (availableComponents.isEmpty()) {
@@ -671,6 +695,26 @@ void MainWindow::addComponentToEntity(const QString& componentName)
             message = "Entity already has Mesh component";
         }
     }
+    else if (componentName == "Tracking Component") {
+        if (!entityManager->hasComponent<bbl::Tracking>(entityID)) {
+            bbl::Tracking newTracking{};
+            // Set default values
+            newTracking.samplingInterval = 0.1f;
+            newTracking.maxControlPoints = 50;
+            newTracking.curveResolution = 20;
+            newTracking.isTracking = false; // Start disabled
+            newTracking.traceColor = glm::vec3(1.0f, 0.0f, 0.0f); // Red by default
+            newTracking.lineWidth = 2.0f;
+
+            entityManager->addComponent(entityID, newTracking);
+            added = true;
+            message = "Added Tracking component to entity";
+        } else {
+            message = "Entity already has Tracking component";
+        }
+    }
+
+
     else {
         QMessageBox::warning(this, "Unknown Component",
                              QString("Unknown component type: %1").arg(componentName));
@@ -778,6 +822,15 @@ void MainWindow::removeComponentFromEntity(const QString& componentName)
             qInfo() << "Removed Mesh component from entity" << entityID;
         }
     }
+
+    else if (componentName == "Tracking Component") {
+        if (entityManager->hasComponent<bbl::Tracking>(entityID)) {
+            entityManager->removeComponent<bbl::Tracking>(entityID);
+            removed = true;
+            qInfo() << "Removed Tracking component from entity" << entityID;
+        }
+    }
+
     else {
         qWarning() << "Unknown component type for removal:" << componentName;
         return;
@@ -847,6 +900,32 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
     QWidget* innerWidget = new QWidget();
     QFormLayout* formLayout = new QFormLayout(innerWidget);
 
+    // Add Clear Trace button for Tracking Component
+    if (name == "Tracking Component") {
+        QPushButton* clearTraceButton = new QPushButton("Clear Trace");
+        clearTraceButton->setStyleSheet(
+            "QPushButton { background-color: #ff6b35; color: white; font-weight: bold; "
+            "border-radius: 4px; padding: 6px 12px; }"
+            "QPushButton:hover { background-color: #ff8c5a; }"
+            "QPushButton:pressed { background-color: #e55a2e; }"
+            );
+
+        connect(clearTraceButton, &QPushButton::clicked, this, [=]() {
+            auto selected = mVulkanWindow->getSelectedEntity();
+            if (!selected.has_value()) return;
+            bbl::EntityID entityID = selected.value();
+
+            if (auto* gameWorld = mVulkanWindow->getGameWorld()) {
+                if (auto* trackingSystem = gameWorld->getTrackingSystem()) {
+                    trackingSystem->clearTracking(entityID);
+                    mVulkanWindow->requestUpdate();
+                }
+            }
+        });
+
+        formLayout->addRow("", clearTraceButton);
+    }
+
     for (auto it = fields.begin(); it != fields.end(); it++) {
         QWidget* editor = nullptr;
         int typeId = it.value().metaType().id();
@@ -908,7 +987,6 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
                         });
             }
 
-
             if (name.contains("Collision")) {
                 QString field = it.key();
                 connect(checkBox, &QCheckBox::toggled, this, [=](bool val) {
@@ -933,17 +1011,53 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
                 });
             }
 
+            // Live update for Tracking
+            if (name.contains("Tracking")) {
+                QString field = it.key();
+                connect(checkBox, &QCheckBox::toggled, this, [=](bool val) {
+                    auto selected = mVulkanWindow->getSelectedEntity();
+                    if (!selected.has_value()) return;
+                    bbl::EntityID entityID = selected.value();
+                    auto* em = mVulkanWindow->getEntityManager();
+                    if (!em) return;
+                    auto* tracking = em->getComponent<bbl::Tracking>(entityID);
+                    if (!tracking) return;
+
+                    if (field == "Is Tracking") {
+                        tracking->isTracking = val;
+                        // Enable/disable tracking through the tracking system
+                        if (auto* gameWorld = mVulkanWindow->getGameWorld()) {
+                            if (auto* trackingSystem = gameWorld->getTrackingSystem()) {
+                                if (val) {
+                                    trackingSystem->enableTracking(entityID, tracking->samplingInterval, tracking->traceColor);
+                                } else {
+                                    trackingSystem->disableTracking(entityID);
+                                }
+                            }
+                        }
+                    }
+                    mVulkanWindow->requestUpdate();
+                });
+            }
 
             break;
         }
 
         case QMetaType::Float:
+        case QMetaType::Int:
         {
             auto* spinBox = new QDoubleSpinBox();
             spinBox->setRange(-10000.0, 10000.0);
             spinBox->setSingleStep(0.05);
             spinBox->setValue(it.value().toDouble());
             spinBox->setDecimals(3);
+
+            // For integer fields, set step to 1 and no decimals
+            if (typeId == QMetaType::Int) {
+                spinBox->setSingleStep(1.0);
+                spinBox->setDecimals(0);
+            }
+
             editor = spinBox;
 
             if (name.contains("Transform")) {
@@ -1035,6 +1149,50 @@ void MainWindow::addComponentUI(const QString& name, const QVariantMap& fields)
                     mVulkanWindow->requestUpdate();
                 });
             }
+
+            // Live update for Tracking
+            if (name.contains("Tracking")) {
+                QString field = it.key();
+                connect(spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [=](double val) {
+                    auto selected = mVulkanWindow->getSelectedEntity();
+                    if (!selected.has_value()) return;
+                    bbl::EntityID entityID = selected.value();
+                    auto* em = mVulkanWindow->getEntityManager();
+                    if (!em) return;
+                    auto* tracking = em->getComponent<bbl::Tracking>(entityID);
+                    if (!tracking) return;
+
+                    if (field == "Sampling Interval") {
+                        tracking->samplingInterval = static_cast<float>(val);
+                    } else if (field == "Line Width") {
+                        tracking->lineWidth = static_cast<float>(val);
+                    } else if (field == "Trace Color R") {
+                        tracking->traceColor.r = static_cast<float>(val);
+                    } else if (field == "Trace Color G") {
+                        tracking->traceColor.g = static_cast<float>(val);
+                    } else if (field == "Trace Color B") {
+                        tracking->traceColor.b = static_cast<float>(val);
+                    } else if (field == "Max Control Points") {
+                        tracking->maxControlPoints = static_cast<size_t>(val);
+                    } else if (field == "Curve Resolution") {
+                        tracking->curveResolution = static_cast<size_t>(val);
+                    }
+
+                    // Update tracking system parameters if tracking is enabled
+                    if (tracking->isTracking) {
+                        if (auto* gameWorld = mVulkanWindow->getGameWorld()) {
+                            if (auto* trackingSystem = gameWorld->getTrackingSystem()) {
+                                trackingSystem->setTrackingColor(entityID, tracking->traceColor);
+                                trackingSystem->setTrackingParameters(entityID, tracking->samplingInterval,
+                                                                      tracking->maxControlPoints, tracking->curveResolution);
+                            }
+                        }
+                    }
+
+                    mVulkanWindow->requestUpdate();
+                });
+            }
+
             break;
         }
 
