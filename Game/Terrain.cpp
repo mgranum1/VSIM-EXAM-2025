@@ -179,11 +179,14 @@ void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radiu
     {
         float distance = glm::length(vertex.pos - zoneCenter);
 
+        // Alt innenfor radiusen hvor det er friksjonsone vil bli farget rødt
         if (distance <= radius)
         {
 
             vertex.color = glm::vec3(1.0f, 0.0f, 0.0f);
         }
+
+        // Alt utenfor vil bli uberørt
         else
         {
             vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);

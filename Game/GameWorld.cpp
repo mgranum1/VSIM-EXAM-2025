@@ -1,5 +1,6 @@
 #include "GameWorld.h"
 #include "../Editor/MainWindow.h"
+#include "../Core/Renderer.h"
 
 bbl::GameWorld::GameWorld()
 {
@@ -54,12 +55,14 @@ void bbl::GameWorld::setupFrictionZone()
 }
 
 
-void bbl::GameWorld::initializeSystems(EntityManager* entityManager)
+void bbl::GameWorld::initializeSystems(EntityManager* entityManager, Renderer* renderer)
 {
     if (!entityManager) {
         qWarning() << "Cannot initialize systems: EntityManager is null!";
         return;
     }
+
+    m_renderer = renderer;
 
     // Physics System
     m_physicsSystem = std::make_unique<PhysicsSystem>(entityManager);
@@ -73,6 +76,8 @@ void bbl::GameWorld::initializeSystems(EntityManager* entityManager)
     m_collisionSystem->setTerrainCollisionEnabled(true);
     m_collisionSystem->setEntityCollisionEnabled(true);
 
+    // Tracking System
+    m_trackingsystem = std::make_unique<TrackingSystemClass>(entityManager);
 
 }
 
@@ -83,11 +88,21 @@ void bbl::GameWorld::update(float dt)
         return;
     }
 
-    if (m_collisionSystem) {
+    if (m_collisionSystem)
+    {
         m_collisionSystem->update(dt);
     }
-    if (m_physicsSystem) {
+
+    if (m_physicsSystem)
+    {
         m_physicsSystem->update(dt);
+    }
+
+    if (m_trackingsystem)
+    {
+        m_trackingsystem->update(dt);
+        m_trackingsystem->updateTraceRenderData();
+        m_renderer->recreateSwapChain();
 
     }
 

@@ -306,15 +306,27 @@ void MainWindow::onButton1Clicked()
         glm::vec3(370.0f, 200.0f, -290.0f)
         );
 
-    auto* entityManager = mVulkanWindow->getEntityManager();
-    auto* sceneManager = mVulkanWindow->getSceneManager();
+    bbl::EntityManager* entityManager = mVulkanWindow->getEntityManager();
+    bbl::SceneManager* sceneManager = mVulkanWindow->getSceneManager();
+    bbl::GameWorld* gameWorld = mVulkanWindow->getGameWorld();
 
     if (entityManager && entityID != bbl::INVALID_ENTITY) {
         entityManager->addComponent(entityID, bbl::Physics{});
         entityManager->addComponent(entityID, bbl::Collision{});
         entityManager->addComponent(entityID, bbl::Audio{});
 
-        if (sceneManager) {
+        // Legger til at ballen blir tracket
+        if (gameWorld && gameWorld->getTrackingSystem())
+        {
+            gameWorld->getTrackingSystem()->enableTracking(
+                entityID,
+                0.05f, // Sampler hvert 50ms
+                glm::vec3(1.0f, 0.0f, 0.0f) // Setter fargen på tracen, fungerer ikke helt optimalt
+                );
+        }
+
+        if (sceneManager)
+        {
             sceneManager->setEntityName(entityID, "ball");
             sceneManager->markSceneDirty();
         }

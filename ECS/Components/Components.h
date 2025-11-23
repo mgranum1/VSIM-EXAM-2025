@@ -20,7 +20,8 @@ enum class ComponentType
     Physics,
     Collision,
     Input,
-    Render
+    Render,
+    Tracking
 };
 
 // COMPONENT STRUCTS
@@ -111,6 +112,28 @@ struct Physics
     glm::vec3 acceleration{0.0f, 0.0f, 0.0f};
     float mass{1.0f};
     bool useGravity{true};
+};
+
+// Oppgave 2.5 tracking av en ball med trace
+struct Tracking
+{
+    float samplingInterval = 0.1f;
+    size_t maxControlPoints = 200;
+    size_t curveResolution = 20;
+    bool isTracking = true;
+
+    std::vector<glm::vec3> controlPoints;
+    std::vector<glm::vec3> curvePoints;
+    glm::vec3 traceColor = glm::vec3(1.0f, 0.0f, 0.0f);
+    float lineWidth = 2.0f;
+
+    std::chrono::steady_clock::time_point lastSampleTime;
+
+    Tracking()
+    {
+        lastSampleTime = std::chrono::steady_clock::now();
+    }
+
 };
 
 // struct Input
