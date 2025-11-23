@@ -31,12 +31,22 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
     const auto& mesh = modelData->meshes[0];
 
     m_vertices.reserve(mesh.vertices.size());
-    for (const auto& v : mesh.vertices) {
+    for (const auto& v : mesh.vertices)
+    {
+        auto vertex = v;
+        vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
+        m_vertices.push_back(vertex);
+    }
+
+    m_vertices.reserve(mesh.vertices.size());
+    for (const auto& v : mesh.vertices)
+    {
         m_vertices.push_back(v);
     }
 
     m_indices.reserve(mesh.indices.size());
-    for (auto index : mesh.indices) {
+    for (auto index : mesh.indices)
+    {
         m_indices.push_back(index);
     }
 
@@ -60,7 +70,7 @@ void Terrain::calculateNormals()
 {
     // Sett normaler til å være null
     for (auto& vertex : m_vertices) {
-        vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
+        vertex.normal = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Kalkuler normaler for hver trekant
@@ -77,17 +87,22 @@ void Terrain::calculateNormals()
         glm::vec3 edge2 = v2 - v0;
         glm::vec3 normal = glm::cross(edge1, edge2);
 
-        m_vertices[idx0].color += normal;
-        m_vertices[idx1].color += normal;
-        m_vertices[idx2].color += normal;
+        m_vertices[idx0].normal += normal;
+        m_vertices[idx1].normal += normal;
+        m_vertices[idx2].normal += normal;
     }
 
     // Normaliser normaler
-    for (auto& vertex : m_vertices) {
-        if (glm::length(vertex.color) > 0.0f) {
-            vertex.color = glm::normalize(vertex.color);
-        } else {
-            vertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    for (auto& vertex : m_vertices)
+    {
+        if (glm::length(vertex.normal) > 0.0f)
+        {
+            vertex.normal = glm::normalize(vertex.normal);
+        }
+
+        else
+        {
+            vertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
         }
     }
 }

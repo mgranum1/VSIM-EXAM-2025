@@ -69,7 +69,8 @@ void bbl::GameWorld::initializeSystems(EntityManager* entityManager, Renderer* r
     m_physicsSystem->setGravity(glm::vec3(0.0f, -9.81f, 0.0f));
     m_physicsSystem->setTerrain(m_terrain.get());
     m_physicsSystem->enableRollingPhysics(true);
-    setupFrictionZone();
+    // Kommenter inn og ut ettersom hva som trengs friksjonsonen
+    //setupFrictionZone();
 
     // Collision System
     m_collisionSystem = std::make_unique<CollisionSystem>(entityManager, m_terrain.get());
