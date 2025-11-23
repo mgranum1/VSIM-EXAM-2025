@@ -55,7 +55,7 @@ public:
         }
     }
 
-    // Disable tracking for an entity
+    // Skrur av tracking for Entity
     void disableTracking(EntityID entity)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -65,7 +65,7 @@ public:
         }
     }
 
-    // Clear tracking data for an entity
+    // Slett tracking data for en Entity
     void clearTracking(EntityID entity)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    // Get line vertices for rendering (call this to get data for your line pipeline)
+    // Linje vertices for rendering
     std::vector<Vertex> getTrackingVertices(EntityID entity) const
     {
         std::vector<Vertex> vertices;
@@ -84,8 +84,9 @@ public:
             return vertices;
         }
 
-        // Convert curve points to vertices for line rendering
-        for (const auto& point : tracking->curvePoints) {
+        // Konverter kurve punkter til linjer
+        for (const auto& point : tracking->curvePoints)
+        {
             Vertex vertex;
             vertex.pos = point;
             vertex.color = tracking->traceColor;
@@ -99,7 +100,7 @@ public:
         return vertices;
     }
 
-    // Get all tracking vertices for all tracked entities
+    // Få verticene til en tracked Entity
     std::vector<Vertex> getAllTrackingVertices() const
     {
         std::vector<Vertex> allVertices;
@@ -114,7 +115,7 @@ public:
         return allVertices;
     }
 
-    // Set tracking parameters for an entity
+    // Sett tracking parametere for en Entity
     void setTrackingParameters(EntityID entity, float samplingInterval,
                                size_t maxControlPoints, size_t curveResolution)
     {
@@ -126,7 +127,7 @@ public:
         }
     }
 
-    // Set tracking color
+    // Sett tracking farge
     void setTrackingColor(EntityID entity, const glm::vec3& color)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -148,7 +149,7 @@ public:
                 continue;
             }
 
-            // Create or update trace entity for rendering
+            // Lag eller oppdater trace Entity for rendering
             updateTraceEntity(entity, *tracking);
         }
     }
@@ -170,7 +171,7 @@ private:
 
     void updateTraceEntity(EntityID ballEntity, const Tracking& tracking)
     {
-        EntityID traceEntity = ballEntity;
+        EntityID traceEntity = ballEntity + 10000; // La til offset for å unngå feil
 
         // Sjekker først om traceEntity eksisterer
         if (!mEntityManager->isValidEntity(traceEntity))

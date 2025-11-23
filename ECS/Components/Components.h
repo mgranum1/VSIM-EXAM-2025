@@ -114,7 +114,7 @@ struct Physics
     bool useGravity{true};
 };
 
-// Oppgave 2.5 tracking av en ball med trace
+// Oppgave 2.5 tracking av en ball med trace med bruk av B spline
 struct Tracking
 {
     float samplingInterval = 0.1f;
