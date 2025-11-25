@@ -142,7 +142,7 @@ float Terrain::getHeightAt(float worldX, float worldZ, const glm::vec3& terrainP
     float localWorldX = worldX - terrainPosition.x;
     float localWorldZ = worldZ - terrainPosition.z;
 
-    // Find trekanten som inneholder dette punktet
+    // Finn trekanten som inneholder dette punktet
     for (size_t i = 0; i < m_indices.size(); i += 3) {
         const auto& v0 = m_vertices[m_indices[i]];
         const auto& v1 = m_vertices[m_indices[i + 1]];
@@ -209,7 +209,7 @@ void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radiu
     }
 }
 
-// Brukes for å sette et friksjons område, tar inn hele terrainet
+// Brukes for å sette et friksjons område, tar inn hele terrainet og returner midt punktet av det
 glm::vec3 Terrain::calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) const
 {
     if (m_vertices.empty())

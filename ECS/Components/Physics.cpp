@@ -183,7 +183,7 @@ int PhysicsSystem::findCurrentTriangle(const glm::vec3& position)
 bool PhysicsSystem::isPointInTriangle(const glm::vec3& point, const glm::vec3& v0,
                                       const glm::vec3& v1, const glm::vec3& v2)
 {
-    // Kalkulerer barysentriske koordinater (Algorithm 9.6 uses barycentric coordinates)
+    // Kalkulerer barysentriske koordinater, Algoritme 9.6 bruker barysentriske koordinater
     glm::vec3 v0v1 = v1 - v0;
     glm::vec3 v0v2 = v2 - v0;
     glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
