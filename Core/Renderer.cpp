@@ -204,8 +204,8 @@ bbl::EntityID Renderer::spawnModel(const std::string& modelPath,
         qInfo() << QString::fromStdString(model->name) << "successfully spawned with EntityID:" << newEntity;
 
         // Update spawn offset for next model
-        mNextSpawnOffset.x += 0.2f;
-        mNextSpawnOffset.z += 0.2f;
+        //mNextSpawnOffset.x += 0.2f;
+        //mNextSpawnOffset.z += 0.2f;
     } else {
         qWarning() << "Failed to spawn from" << QString::fromStdString(modelPath);
     }
@@ -480,6 +480,19 @@ void Renderer::recreateSwapChain() {
 
     imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
 }
+
+void Renderer::recreateCommandBuffers()
+{
+    vkDeviceWaitIdle(device);
+
+    if(!commandBuffers.empty())
+    {
+        vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    }
+
+    createCommandBuffers();
+}
+
 
 void Renderer::createInstance() {
     if (enableValidationLayers && !checkValidationLayerSupport()) {

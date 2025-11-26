@@ -117,15 +117,20 @@ struct Physics
 // Oppgave 2.5 tracking av en ball med trace med bruk av B spline
 struct Tracking
 {
-    float samplingInterval = 0.1f;
-    size_t maxControlPoints = 200;
-    size_t curveResolution = 20;
+    float samplingInterval = 0.2f;
+    size_t maxControlPoints = 20;
+    size_t curveResolution = 5;
     bool isTracking = true;
 
     std::vector<glm::vec3> controlPoints;
     std::vector<glm::vec3> curvePoints;
     glm::vec3 traceColor = glm::vec3(1.0f, 0.0f, 0.0f);
     float lineWidth = 2.0f;
+
+    bool shouldUpdateRender{false};
+    uint32_t lastMeshID = 0;
+    EntityID traceEntityID = 0;
+
 
     std::chrono::steady_clock::time_point lastSampleTime;
 

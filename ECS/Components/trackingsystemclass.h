@@ -35,7 +35,7 @@ public:
         }
     }
 
-    // Legger til tracking for en Entity, hvis ikke den har component blir den lagt til
+    // Legger til tracking for en Entity, hvis den ikke har tracking component blir den lagt til
     void enableTracking(EntityID entity, float samplingInterval = 0.1f,
                         const glm::vec3& color = glm::vec3(1.0f, 0.0f, 0.0f))
     {
@@ -44,6 +44,7 @@ public:
             tracking.samplingInterval = samplingInterval;
             tracking.traceColor = color;
             tracking.isTracking = true;
+            tracking.shouldUpdateRender = true;
             mEntityManager->addComponent(entity, tracking);
         } else {
             auto* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -51,6 +52,7 @@ public:
                 tracking->isTracking = true;
                 tracking->samplingInterval = samplingInterval;
                 tracking->traceColor = color;
+                tracking->shouldUpdateRender = true;
             }
         }
     }
@@ -146,12 +148,17 @@ public:
 
         for (EntityID entity : trackedEntities) {
             bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
-            if (!tracking || !tracking->isTracking || tracking->curvePoints.empty()) {
+            if (!tracking || !tracking->isTracking || !tracking->shouldUpdateRender || tracking->curvePoints.empty())
+            {
                 continue;
             }
 
             // Lag eller oppdater trace Entity for rendering
-            updateTraceEntity(entity, *tracking);
+            if(tracking->shouldUpdateRender)
+            {
+                updateTraceEntity(entity, *tracking);
+                tracking->shouldUpdateRender = false;
+            }
         }
     }
 
@@ -167,21 +174,22 @@ private:
             // Legg til nåværende posisjon som et kontroll punkt
             TrackingSystem::addControlPoint(tracking, transform.position);
             TrackingSystem::updateSampleTime(tracking);
+            tracking.shouldUpdateRender = true;
         }
     }
 
-    void updateTraceEntity(EntityID ballEntity, const Tracking& tracking)
+    void updateTraceEntity(EntityID ballEntity, Tracking& tracking)
     {
-        EntityID traceEntity = ballEntity + 10000; // La til offset for å unngå feil
+        EntityID traceEntity = tracking.traceEntityID;
 
-        // Sjekker først om traceEntity eksisterer
-        if (!mEntityManager->isValidEntity(traceEntity))
+        // Sjekker først om traceEntity eksisterer og legger deretter til en transform
+        if (traceEntity == 0 || !mEntityManager->isValidEntity(traceEntity))
         {
-            traceEntity = mEntityManager->createEntityWithID(traceEntity);
-
-            // Legger til en transform component
+            traceEntity = mEntityManager->createEntity();
+            tracking.traceEntityID = traceEntity; //
             mEntityManager->addComponent(traceEntity, Transform{});
         }
+
 
         // Konverterer punktene til Ballen til mesh data
         if (tracking.curvePoints.size() >= 2) {
@@ -190,15 +198,21 @@ private:
             // Laster opp mesh data til GPUen og oppdaterer/lager Render component
             if (GPUResourceManager* gpuResources = mEntityManager->getGPUResourceManager())
             {
+
+                bbl::Render* renderComp = mEntityManager->getComponent<Render>(traceEntity);
+                if (renderComp && renderComp->meshResourceID != 0) {
+                    gpuResources->releaseMeshResources(renderComp->meshResourceID);
+                }
+
                 auto meshResourceID = gpuResources->uploadMesh(meshData);
 
                 // Oppdaterer eller legger til Render component
                 if (!mEntityManager->hasComponent<Render>(traceEntity)) {
                     mEntityManager->addComponent(traceEntity, Render{});
+                    renderComp = mEntityManager->getComponent<Render>(traceEntity); // Get the new component
                 }
 
                 // Setter default verdier
-                auto* renderComp = mEntityManager->getComponent<Render>(traceEntity);
                 if (renderComp)
                 {
                     renderComp->meshResourceID = meshResourceID;

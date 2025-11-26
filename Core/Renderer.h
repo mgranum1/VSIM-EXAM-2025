@@ -78,6 +78,8 @@
         bbl::EntityID spawnModel(const std::string& modelPath, const std::string& texturePath, const glm::vec3& basePosition);
         void recreateSwapChain();
 
+        void recreateCommandBuffers();
+
     protected:
         //Qt event handlers - called when requestUpdate(); is called
         void exposeEvent(QExposeEvent* event) override;

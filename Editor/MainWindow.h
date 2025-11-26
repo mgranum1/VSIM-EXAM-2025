@@ -73,6 +73,7 @@ private:
 
     // Spawne baller med tids intervall
     int ballsSpawned = 0;
+    int maxBallsSpawn = 100;
     void spawnBallsDelay();
 
 

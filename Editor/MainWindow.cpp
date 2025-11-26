@@ -371,7 +371,7 @@ void MainWindow::onButton3Clicked()
 
 void MainWindow::spawnBallsDelay()
 {
-    if (ballsSpawned >= 50)
+    if (ballsSpawned >= maxBallsSpawn)
     {
         return;
     }
@@ -391,23 +391,21 @@ void MainWindow::spawnBallsDelay()
         {
             entityManager->addComponent(entityID, bbl::Physics{});
             entityManager->addComponent(entityID, bbl::Collision{});
-            entityManager->addComponent(entityID, bbl::Audio{});
-
 
             if (entityManager->hasComponent<bbl::Collision>(entityID))
             {
                 const auto& Collision = entityManager->getComponent<bbl::Collision>(entityID);
 
                 Collision->isStatic = true;
-            }
 
+            }
 
             // Legger til at ballen blir tracket
             if (gameWorld && gameWorld->getTrackingSystem())
             {
                 gameWorld->getTrackingSystem()->enableTracking(
                     entityID,
-                    0.5f, // Sampler hvert 500ms
+                    1.f, // Velg samplingfarten
                     glm::vec3(1.0f, 0.0f, 0.0f) // Setter fargen på tracen
                     );
             }
@@ -422,14 +420,17 @@ void MainWindow::spawnBallsDelay()
             qInfo() << "Spawned ball" << ballsSpawned << "with EntityID:" << entityID;
         }
 
-        mVulkanWindow->recreateSwapChain();
+        if (ballsSpawned >= maxBallsSpawn)
+        {
+         mVulkanWindow->recreateSwapChain();
+        }
         mVulkanWindow->requestUpdate();
         updateSceneObjectList();
 
 
-        if (ballsSpawned < 50)
+        if (ballsSpawned < maxBallsSpawn)
         {
-            QTimer::singleShot(500, this, &::MainWindow::spawnBallsDelay);
+            QTimer::singleShot(1, this, &::MainWindow::spawnBallsDelay);
         }
 
 
