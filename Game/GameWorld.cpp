@@ -107,5 +107,4 @@ void bbl::GameWorld::update(float dt)
         m_trackingsystem->updateTraceRenderData();
         m_renderer->recreateSwapChain();
     }
-
 }
