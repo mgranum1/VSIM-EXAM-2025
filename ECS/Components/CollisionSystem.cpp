@@ -158,11 +158,16 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
     float overlapZ = totalHalfSize.z - std::abs(delta.z);
 
     glm::vec3 separation(0.0f);
-    if (overlapX < overlapY && overlapX < overlapZ) {
+    if (overlapX < overlapY && overlapX < overlapZ)
+    {
         separation.x = (delta.x > 0) ? overlapX : -overlapX;
-    } else if (overlapY < overlapZ) {
+    }
+    else if (overlapY < overlapZ)
+    {
         separation.y = (delta.y > 0) ? overlapY : -overlapY;
-    } else {
+    }
+    else
+    {
         separation.z = (delta.z > 0) ? overlapZ : -overlapZ;
     }
 

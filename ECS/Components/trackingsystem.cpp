@@ -28,12 +28,13 @@ namespace bbl
     {
         // Legger til nye kontroll punkt til B spline kurven
 
-        auto& controlPoints = const_cast<std::vector<glm::vec3>&>(tracking.controlPoints);
+        std::vector<glm::vec3>& controlPoints = const_cast<std::vector<glm::vec3>&>(tracking.controlPoints);
         controlPoints.push_back(position);
 
         // Sletter gamle kontroll punkt hvis vi overstiger max antall
         // Begrenser antall kontrollpunkter for å unngå for lang kurve
-        if (controlPoints.size() > tracking.maxControlPoints) {
+        if (controlPoints.size() > tracking.maxControlPoints)
+        {
             controlPoints.erase(controlPoints.begin());
         }
 
@@ -48,8 +49,8 @@ namespace bbl
     void clearTrace(Tracking& tracking)
     {
         // Tømmer alle sporingspunkter - både kontrollpunkter og kurvepunkter
-        auto& controlPoints = const_cast<std::vector<glm::vec3>&>(tracking.controlPoints);
-        auto& curvePoints = const_cast<std::vector<glm::vec3>&>(tracking.curvePoints);
+        std::vector<glm::vec3>& controlPoints = const_cast<std::vector<glm::vec3>&>(tracking.controlPoints);
+        std::vector<glm::vec3>& curvePoints = const_cast<std::vector<glm::vec3>&>(tracking.curvePoints);
 
         controlPoints.clear();
         curvePoints.clear();
@@ -68,7 +69,8 @@ namespace bbl
         // Lager kurversegmenter mellom påfølgende kontrollpunkter
         // Dette følger den lokale support egenskapen til B splines side 75 i forelesningsnotatene
         // Hver segment påvirkes kun av 4 nabokontrollpunkter
-        for (size_t i = 0; i < tracking.controlPoints.size() - 3; ++i) {
+        for (size_t i = 0; i < tracking.controlPoints.size() - 3; ++i)
+        {
             generateBSplineSegment(
                 tracking.controlPoints[i],
                 tracking.controlPoints[i + 1],
@@ -87,7 +89,8 @@ namespace bbl
     {
         // Genererer punkter langs et enkelt B-spline segment
         // Parameter t går fra 0 til 1 for dette segmentet
-        for (size_t i = 0; i <= resolution; ++i) {
+        for (size_t i = 0; i <= resolution; ++i)
+        {
             float t = static_cast<float>(i) / static_cast<float>(resolution);
             glm::vec3 point = evaluateBSpline(p0, p1, p2, p3, t);
             curvePoints.push_back(point);

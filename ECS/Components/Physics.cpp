@@ -145,7 +145,7 @@ glm::vec3 PhysicsSystem::calculateFrictionForce(const glm::vec3& velocity, const
     // Friksjonskraft = μ * N
     float frictionMagnitude = currentFriction * normalForce;
 
-    // Returner friksjonskraften som akselerasjon (F = ma, så a = F/m, antatt m=1)
+    // Returner friksjonskraften som akselerasjon (F = ma, så a = F/m, antatt m = 1)
     return frictionDirection * frictionMagnitude;
 }
 
@@ -157,8 +157,8 @@ int PhysicsSystem::findCurrentTriangle(const glm::vec3& position)
     }
 
     // Henter triangulert punktsky mesh data fra Terrain klassen
-    const auto& vertices = m_terrain->getVertices();
-    const auto& indices = m_terrain->getIndices();
+    const std::vector<Vertex>& vertices = m_terrain->getVertices();
+    const std::vector<unsigned int>& indices = m_terrain->getIndices();
 
     if (vertices.empty() || indices.empty()) {
         return -1;
@@ -244,8 +244,8 @@ glm::vec3 PhysicsSystem::calculateSurfaceNormal(int triangleIndex)
     }
 
     // Henter triangulert punktsky mesh data fra Terrain klassen
-    const auto& vertices = m_terrain->getVertices();
-    const auto& indices = m_terrain->getIndices();
+    const std::vector<Vertex>& vertices = m_terrain->getVertices();
+    const std::vector<unsigned int>& indices = m_terrain->getIndices();
 
     if (triangleIndex < 0 || static_cast<size_t>(triangleIndex * 3 + 2) >= indices.size())
     {

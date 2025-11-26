@@ -18,7 +18,7 @@ Terrain::~Terrain()
 bool Terrain::loadFromOBJ(const std::string& filepath)
 {
     bbl::ModelLoader loader;
-    auto modelData = loader.loadModel(filepath);
+    std::unique_ptr<bbl::ModelData> modelData = loader.loadModel(filepath);
     if (!modelData || modelData->meshes.empty())
     {
         std::cerr << "Failed to load OBJ model: " << filepath << std::endl;
@@ -28,24 +28,24 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
     m_vertices.clear();
     m_indices.clear();
 
-    const auto& mesh = modelData->meshes[0];
+    const bbl::MeshData& mesh = modelData->meshes[0];
 
     m_vertices.reserve(mesh.vertices.size());
-    for (const auto& v : mesh.vertices)
+    for (const Vertex& v : mesh.vertices)
     {
-        auto vertex = v;
+        Vertex vertex = v;
         vertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
         m_vertices.push_back(vertex);
     }
 
     m_vertices.reserve(mesh.vertices.size());
-    for (const auto& v : mesh.vertices)
+    for (const Vertex& v : mesh.vertices)
     {
         m_vertices.push_back(v);
     }
 
     m_indices.reserve(mesh.indices.size());
-    for (auto index : mesh.indices)
+    for (unsigned int index : mesh.indices)
     {
         m_indices.push_back(index);
     }
@@ -57,7 +57,7 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
     // Lagre min og maks høyde for kollisjon handling
     float minHeight = FLT_MAX;
     float maxHeight = -FLT_MAX;
-    for (const auto& v : m_vertices) {
+    for (const Vertex& v : m_vertices) {
         if (v.pos.y < minHeight) minHeight = v.pos.y;
         if (v.pos.y > maxHeight) maxHeight = v.pos.y;
     }
@@ -69,7 +69,7 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
 void Terrain::calculateNormals()
 {
     // Sett normaler til å være null
-    for (auto& vertex : m_vertices) {
+    for (Vertex& vertex : m_vertices) {
         vertex.normal = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
@@ -93,7 +93,7 @@ void Terrain::calculateNormals()
     }
 
     // Normaliser normaler
-    for (auto& vertex : m_vertices)
+    for (Vertex& vertex : m_vertices)
     {
         if (glm::length(vertex.normal) > 0.0f)
         {
@@ -144,9 +144,9 @@ float Terrain::getHeightAt(float worldX, float worldZ, const glm::vec3& terrainP
 
     // Finn trekanten som inneholder dette punktet
     for (size_t i = 0; i < m_indices.size(); i += 3) {
-        const auto& v0 = m_vertices[m_indices[i]];
-        const auto& v1 = m_vertices[m_indices[i + 1]];
-        const auto& v2 = m_vertices[m_indices[i + 2]];
+        const Vertex& v0 = m_vertices[m_indices[i]];
+        const Vertex& v1 = m_vertices[m_indices[i + 1]];
+        const Vertex& v2 = m_vertices[m_indices[i + 2]];
 
         // Sjekk om punktet er inni triangelen med 2D projeksjon
         if (isPointInTriangleXZ(glm::vec2(localWorldX, localWorldZ),
@@ -190,7 +190,7 @@ glm::vec3 Terrain::getCenter() const
 // Skravere området rødt hvor det er ekstra mye friksjon
 void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radius, const glm::vec3& zoneColor)
 {
-    for (auto& vertex : m_vertices)
+    for (Vertex& vertex : m_vertices)
     {
         float distance = glm::length(vertex.pos - zoneCenter);
 
@@ -220,7 +220,7 @@ glm::vec3 Terrain::calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) c
 
     minBounds = maxBounds = m_vertices[0].pos;
 
-    for (const auto& vertex : m_vertices)
+    for (const Vertex& vertex : m_vertices)
     {
         minBounds.x = std::min(minBounds.x, vertex.pos.x);
         minBounds.y = std::min(minBounds.y, vertex.pos.y);

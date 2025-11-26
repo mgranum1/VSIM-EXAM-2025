@@ -22,14 +22,16 @@ public:
     {
         if (!mEntityManager) return;
 
-        // Get all entities with both Transform and Tracking components
+        // Hent alle entities med både transform og tracking components
         std::vector<EntityID> trackedEntities = mEntityManager->getEntitiesWith<Transform, Tracking>();
 
-        for (EntityID entity : trackedEntities) {
+        for (EntityID entity : trackedEntities)
+        {
             bbl::Transform* transform = mEntityManager->getComponent<Transform>(entity);
             bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
 
-            if (transform && tracking && tracking->isTracking) {
+            if (transform && tracking && tracking->isTracking)
+            {
                 updateTracking(entity, *transform, *tracking);
             }
         }
@@ -39,14 +41,18 @@ public:
     void enableTracking(EntityID entity, float samplingInterval = 0.1f,
                         const glm::vec3& color = glm::vec3(1.0f, 0.0f, 0.0f))
     {
-        if (!mEntityManager->hasComponent<Tracking>(entity)) {
+        if (!mEntityManager->hasComponent<Tracking>(entity))
+        {
             Tracking tracking;
             tracking.samplingInterval = samplingInterval;
             tracking.traceColor = color;
             tracking.isTracking = true;
             mEntityManager->addComponent(entity, tracking);
-        } else {
-            auto* tracking = mEntityManager->getComponent<Tracking>(entity);
+        }
+
+        else
+        {
+            bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
             if (tracking) {
                 tracking->isTracking = true;
                 tracking->samplingInterval = samplingInterval;
@@ -55,7 +61,7 @@ public:
         }
     }
 
-    // Disable tracking for an entity
+    // Stans tracking av en entity
     void disableTracking(EntityID entity)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -65,31 +71,33 @@ public:
         }
     }
 
-    // Clear tracking data for an entity
+    // Slett tracking data for en entity
     void clearTracking(EntityID entity)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
-        if (tracking) {
+        if (tracking)
+        {
             TrackingSystem::clearTrace(*tracking);
         }
     }
 
-    // Get line vertices for rendering (call this to get data for your line pipeline)
+    // Hent vertices for å rendere linjer bak objektet
     std::vector<Vertex> getTrackingVertices(EntityID entity) const
     {
         std::vector<Vertex> vertices;
 
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
-        if (!tracking || tracking->curvePoints.empty()) {
+        if (!tracking || tracking->curvePoints.empty())
+        {
             return vertices;
         }
 
-        // Convert curve points to vertices for line rendering
-        for (const auto& point : tracking->curvePoints) {
+        // Konverterer kurve punkter til vertices for linje rendering
+        for (const auto& point : tracking->curvePoints)
+        {
             Vertex vertex;
             vertex.pos = point;
             vertex.color = tracking->traceColor;
-            // Set defaults for other vertex attributes
             vertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
             vertex.texCoord = glm::vec2(0.0f, 0.0f);
 
@@ -99,14 +107,15 @@ public:
         return vertices;
     }
 
-    // Get all tracking vertices for all tracked entities
+    // Hent alle tracking vertices for alle entities som blir tracked
     std::vector<Vertex> getAllTrackingVertices() const
     {
         std::vector<Vertex> allVertices;
 
         std::vector<EntityID> trackedEntities = mEntityManager->getEntitiesWith<Transform, Tracking>();
 
-        for (EntityID entity : trackedEntities) {
+        for (EntityID entity : trackedEntities)
+        {
             std::vector<Vertex> entityVertices = getTrackingVertices(entity);
             allVertices.insert(allVertices.end(), entityVertices.begin(), entityVertices.end());
         }
@@ -114,7 +123,7 @@ public:
         return allVertices;
     }
 
-    // Set tracking parameters for an entity
+    // Sett tracking parametere for en entity
     void setTrackingParameters(EntityID entity, float samplingInterval,
                                size_t maxControlPoints, size_t curveResolution)
     {
@@ -126,7 +135,7 @@ public:
         }
     }
 
-    // Set tracking color
+    // Sett farge på linjen, denne fungerer ikke helt korrekt
     void setTrackingColor(EntityID entity, const glm::vec3& color)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
@@ -140,15 +149,17 @@ public:
     {
         if (!mEntityManager) return;
 
-        auto trackedEntities = mEntityManager->getEntitiesWith<Transform, Tracking>();
+        std::vector<EntityID> trackedEntities = mEntityManager->getEntitiesWith<Transform, Tracking>();
 
-        for (EntityID entity : trackedEntities) {
+        for (EntityID entity : trackedEntities)
+        {
             bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
-            if (!tracking || !tracking->isTracking || tracking->curvePoints.empty()) {
+            if (!tracking || !tracking->isTracking || tracking->curvePoints.empty())
+            {
                 continue;
             }
 
-            // Create or update trace entity for rendering
+            // Opprett eller oppdater trace entitien for rendering
             updateTraceEntity(entity, *tracking);
         }
     }
@@ -182,7 +193,8 @@ private:
         }
 
         // Konverterer punktene til Ballen til mesh data
-        if (tracking.curvePoints.size() >= 2) {
+        if (tracking.curvePoints.size() >= 2)
+        {
             bbl::MeshData meshData = createLineMeshFromPoints(tracking.curvePoints, tracking.traceColor);
 
             // Laster opp mesh data til GPUen og oppdaterer/lager Render component
@@ -191,12 +203,13 @@ private:
                 auto meshResourceID = gpuResources->uploadMesh(meshData);
 
                 // Oppdaterer eller legger til Render component
-                if (!mEntityManager->hasComponent<Render>(traceEntity)) {
+                if (!mEntityManager->hasComponent<Render>(traceEntity))
+                {
                     mEntityManager->addComponent(traceEntity, Render{});
                 }
 
                 // Setter default verdier
-                auto* renderComp = mEntityManager->getComponent<Render>(traceEntity);
+                bbl::Render* renderComp = mEntityManager->getComponent<Render>(traceEntity);
                 if (renderComp)
                 {
                     renderComp->meshResourceID = meshResourceID;
