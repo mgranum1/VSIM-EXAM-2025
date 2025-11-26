@@ -171,30 +171,30 @@ void GPUResourceManager::releaseTextureResources(TextureResourceID id)
 
 void GPUResourceManager::cleanup()
 {
-    std::cout << "GPUResourceManager::cleanup() called" << std::endl;
-    std::cout << "Mesh resources count: " << mMeshResources.size() << std::endl;
-    std::cout << "Texture resources count: " << mTextureResources.size() << std::endl;
+    //std::cout << "GPUResourceManager::cleanup() called" << std::endl;
+    //std::cout << "Mesh resources count: " << mMeshResources.size() << std::endl;
+    //std::cout << "Texture resources count: " << mTextureResources.size() << std::endl;
 
     // Clean up all mesh resources
     for (auto& pair : mMeshResources) {
         auto& resources = pair.second;
-        std::cout << "Cleaning up mesh ID: " << pair.first << std::endl;
+        //std::cout << "Cleaning up mesh ID: " << pair.first << std::endl;
 
         if (resources->indexBuffer != VK_NULL_HANDLE) {
             vkDestroyBuffer(mDevice, resources->indexBuffer, nullptr);
-            std::cout << "  Destroyed index buffer" << std::endl;
+            //std::cout << "  Destroyed index buffer" << std::endl;
         }
         if (resources->indexBufferMemory != VK_NULL_HANDLE) {
             vkFreeMemory(mDevice, resources->indexBufferMemory, nullptr);
-            std::cout << "  Freed index buffer memory" << std::endl;
+            //std::cout << "  Freed index buffer memory" << std::endl;
         }
         if (resources->vertexBuffer != VK_NULL_HANDLE) {
             vkDestroyBuffer(mDevice, resources->vertexBuffer, nullptr);
-            std::cout << "  Destroyed vertex buffer" << std::endl;
+            //std::cout << "  Destroyed vertex buffer" << std::endl;
         }
         if (resources->vertexBufferMemory != VK_NULL_HANDLE) {
             vkFreeMemory(mDevice, resources->vertexBufferMemory, nullptr);
-            std::cout << "  Freed vertex buffer memory" << std::endl;
+           // std::cout << "  Freed vertex buffer memory" << std::endl;
         }
     }
     mMeshResources.clear();
@@ -202,27 +202,27 @@ void GPUResourceManager::cleanup()
     //Clean up all texture resources
     for (auto& pair : mTextureResources) {
         auto& resources = pair.second;
-        std::cout << "Cleaning up texture ID: " << pair.first << std::endl;
+        //std::cout << "Cleaning up texture ID: " << pair.first << std::endl;
 
         if (resources->textureSampler != VK_NULL_HANDLE) {
             vkDestroySampler(mDevice, resources->textureSampler, nullptr);
-            std::cout << "  Destroyed sampler" << std::endl;
+            //std::cout << "  Destroyed sampler" << std::endl;
         }
         if (resources->textureImageView != VK_NULL_HANDLE) {
             vkDestroyImageView(mDevice, resources->textureImageView, nullptr);
-            std::cout << "  Destroyed image view" << std::endl;
+            //std::cout << "  Destroyed image view" << std::endl;
         }
         if (resources->textureImage != VK_NULL_HANDLE) {
             vkDestroyImage(mDevice, resources->textureImage, nullptr);
-            std::cout << "  Destroyed image" << std::endl;  // THIS IS IMPORTANT
+            //std::cout << "  Destroyed image" << std::endl;  // THIS IS IMPORTANT
         }
         if (resources->textureImageMemory != VK_NULL_HANDLE) {
             vkFreeMemory(mDevice, resources->textureImageMemory, nullptr);
-            std::cout << "  Freed image memory" << std::endl;  // THIS IS IMPORTANT
+            //std::cout << "  Freed image memory" << std::endl;  // THIS IS IMPORTANT
         }
     }
 
-    std::cout << "GPUResourceManager cleanup complete" << std::endl;
+    //std::cout << "GPUResourceManager cleanup complete" << std::endl;
 }
 
 // ============= Vulkan Helper Functions (moved from ModelLoader) =============

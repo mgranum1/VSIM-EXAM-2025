@@ -402,13 +402,13 @@ void Renderer::cleanup()
     // vkDestroyBuffer(device, vertexBuffer, nullptr);
     // vkFreeMemory(device, vertexBufferMemory, nullptr);
 
-    std::cout << "Cleaning up uniform buffers..." << std::endl;
+    //std::cout << "Cleaning up uniform buffers..." << std::endl;
     for (size_t i = 0; i < swapChainImages.size(); i++) {
-        std::cout << "  Destroying uniform buffer " << i << std::endl;
+        //std::cout << "  Destroying uniform buffer " << i << std::endl;
         vkDestroyBuffer(device, uniformBuffers[i], nullptr);
         vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
     }
-    std::cout << "Uniform buffers cleanup complete" << std::endl;
+    //std::cout << "Uniform buffers cleanup complete" << std::endl;
 
     // destroy per-image renderFinished semaphores
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -449,13 +449,13 @@ void Renderer::recreateSwapChain() {
     {
         if (uniformBuffers[i] != VK_NULL_HANDLE)
         {
-            std::cout << "  Destroying old uniform buffer " << i << std::endl;
+            //std::cout << "  Destroying old uniform buffer " << i << std::endl;
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             uniformBuffers[i] = VK_NULL_HANDLE;
         }
         if (uniformBuffersMemory[i] != VK_NULL_HANDLE)
         {
-            std::cout << "  Freeing old uniform buffer memory " << i << std::endl;
+            //std::cout << "  Freeing old uniform buffer memory " << i << std::endl;
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
             uniformBuffersMemory[i] = VK_NULL_HANDLE;
         }
@@ -970,9 +970,9 @@ void Renderer::createGraphicsPipeline(std::string vertPath, std::string fragPath
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");
         }
-        std::cout << "Created new pipeline layout: " << pipelineLayout << std::endl;
+       // std::cout << "Created new pipeline layout: " << pipelineLayout << std::endl;
     } else {
-        std::cout << "Reusing existing pipeline layout: " << pipelineLayout << std::endl;
+        //std::cout << "Reusing existing pipeline layout: " << pipelineLayout << std::endl;
     }
 
     // 10. Create the pipeline
