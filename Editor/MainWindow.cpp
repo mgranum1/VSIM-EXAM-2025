@@ -6,6 +6,7 @@
 #include "../Core/Utility/BblHub.h"
 #include "../Game/GameWorld.h"
 
+#include <QTimer>
 #include <QFileDialog>
 #include <QApplication>
 #include <QDateTime>
@@ -144,19 +145,27 @@ QWidget* MainWindow::createTopBar()
     topLayout->setAlignment(Qt::AlignCenter);
 
     // ------Spawn buttons-----
-    QPushButton* button1 = new QPushButton("Button 1", topBar);
+    QPushButton* button1 = new QPushButton("Spawn ball", topBar);
     button1->setFixedSize(80, 40);
     button1->setStyleSheet(
         "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
-    QPushButton* button2 = new QPushButton("Button 2", topBar);
+    QPushButton* button2 = new QPushButton("Spawn terrain", topBar);
     button2->setFixedSize(80, 40);
     button2->setStyleSheet(
         "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
         "QPushButton:hover { background-color: #3399FF; }"
         );
+
+    QPushButton* button3 = new QPushButton("Fluid simulation", topBar);
+    button2->setFixedSize(80, 40);
+    button2->setStyleSheet(
+        "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #3399FF; }"
+        );
+
 
     // -----Play button------
     playButton = new QPushButton("▶ Play", topBar);
@@ -167,6 +176,7 @@ QWidget* MainWindow::createTopBar()
     // ----Button layout-----
     topLayout->addWidget(button1);
     topLayout->addWidget(button2);
+    topLayout->addWidget(button3);
     topLayout->addStretch();
     topLayout->addWidget(playButton);
     topLayout->addStretch();
@@ -174,6 +184,7 @@ QWidget* MainWindow::createTopBar()
     // ----Connect buttons------
     connect(button1, &QPushButton::clicked, this, &MainWindow::onButton1Clicked);
     connect(button2, &QPushButton::clicked, this, &MainWindow::onButton2Clicked);
+    connect(button3, &QPushButton::clicked, this, &MainWindow::onButton3Clicked);
 
     return topBar;
 }
@@ -344,6 +355,84 @@ void MainWindow::onButton2Clicked()
     mVulkanWindow->spawnTerrain();
     mVulkanWindow->requestUpdate();
     updateSceneObjectList();
+}
+
+void MainWindow::onButton3Clicked()
+{
+
+    if (!isPlaying)
+    {
+        onPlayToggled();
+    }
+
+    ballsSpawned = 0;
+    spawnBallsDelay();
+}
+
+void MainWindow::spawnBallsDelay()
+{
+    if (ballsSpawned >= 50)
+    {
+        return;
+    }
+
+        // Spawn the ball
+        bbl::EntityID entityID = mVulkanWindow->spawnModel(
+            "../../Assets/Models/Ball2.obj",
+            "../../Assets/Textures/Blue.jpg",
+            glm::vec3(370.0f, 200.0f, -290.0f)
+            );
+
+        bbl::EntityManager* entityManager = mVulkanWindow->getEntityManager();
+        bbl::SceneManager* sceneManager = mVulkanWindow->getSceneManager();
+        bbl::GameWorld* gameWorld = mVulkanWindow->getGameWorld();
+
+        if (entityManager && entityID != bbl::INVALID_ENTITY)
+        {
+            entityManager->addComponent(entityID, bbl::Physics{});
+            entityManager->addComponent(entityID, bbl::Collision{});
+            entityManager->addComponent(entityID, bbl::Audio{});
+
+
+            if (entityManager->hasComponent<bbl::Collision>(entityID))
+            {
+                const auto& Collision = entityManager->getComponent<bbl::Collision>(entityID);
+
+                Collision->isStatic = true;
+            }
+
+
+            // Legger til at ballen blir tracket
+            if (gameWorld && gameWorld->getTrackingSystem())
+            {
+                gameWorld->getTrackingSystem()->enableTracking(
+                    entityID,
+                    0.5f, // Sampler hvert 500ms
+                    glm::vec3(1.0f, 0.0f, 0.0f) // Setter fargen på tracen
+                    );
+            }
+
+            if (sceneManager)
+            {
+                sceneManager->setEntityName(entityID, "ball_" + std::to_string(ballsSpawned + 1));
+                sceneManager->markSceneDirty();
+            }
+
+            ballsSpawned++;
+            qInfo() << "Spawned ball" << ballsSpawned << "with EntityID:" << entityID;
+        }
+
+        mVulkanWindow->recreateSwapChain();
+        mVulkanWindow->requestUpdate();
+        updateSceneObjectList();
+
+
+        if (ballsSpawned < 50)
+        {
+            QTimer::singleShot(500, this, &::MainWindow::spawnBallsDelay);
+        }
+
+
 }
 
 void MainWindow::onSceneObjectSelected(QListWidgetItem* item)

@@ -71,6 +71,11 @@ private:
     QWidget* componentPanelWidget = nullptr;
     QVBoxLayout* componentLayout = nullptr;
 
+    // Spawne baller med tids intervall
+    int ballsSpawned = 0;
+    void spawnBallsDelay();
+
+
     //=========================================================================
     // Initialization Helpers
     //=========================================================================
@@ -105,6 +110,7 @@ private slots:
     void onPlayToggled();
     void onButton1Clicked();
     void onButton2Clicked();
+    void onButton3Clicked();
 
     //=========================================================================
     // UI Interactions

@@ -22,7 +22,7 @@ public:
     {
         if (!mEntityManager) return;
 
-        // Get all entities with both Transform and Tracking components
+        // Hent alle entities med både transform og tracking components
         std::vector<EntityID> trackedEntities = mEntityManager->getEntitiesWith<Transform, Tracking>();
 
         for (EntityID entity : trackedEntities) {
@@ -120,7 +120,8 @@ public:
                                size_t maxControlPoints, size_t curveResolution)
     {
         bbl::Tracking* tracking = mEntityManager->getComponent<Tracking>(entity);
-        if (tracking) {
+        if (tracking)
+        {
             tracking->samplingInterval = samplingInterval;
             tracking->maxControlPoints = maxControlPoints;
             tracking->curveResolution = curveResolution;
