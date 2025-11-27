@@ -247,7 +247,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                 attrib.vertices[3 * vi + 2]
             };
 
-            // Add normal for point cloud (default upward)
+            // Legger til normal for punkt sky, normal oppover
             v.normal = {0.0f, 1.0f, 0.0f};
 
             if (attrib.colors.size() > 3 * vi + 2) {
