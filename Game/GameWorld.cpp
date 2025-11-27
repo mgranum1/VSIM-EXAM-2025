@@ -22,6 +22,7 @@ void bbl::GameWorld::Setup()
 
 }
 
+// Task 2.3
 void bbl::GameWorld::setupFrictionZone()
 {
     if (!m_terrain) {

@@ -171,7 +171,7 @@ void CollisionSystem::resolveCollision(EntityID entityA, EntityID entityB,
         separation.z = (delta.z > 0) ? overlapZ : -overlapZ;
     }
 
-    // Oppgave 2.4 - Håndtering av statiske objekter
+    // Task 2.4 - Håndtering av statiske objekter
 
     // Kapitell 9.7 kollisjoner - 9.7.1 kollisjon mellom ball - veg
 

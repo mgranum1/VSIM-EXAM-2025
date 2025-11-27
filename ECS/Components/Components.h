@@ -97,6 +97,7 @@ struct Audio
     ALuint deathSource = 0;
 };
 
+// Task 2.4
 struct Collision
 {
     glm::vec3 colliderSize{1.0f, 1.0f, 1.0f};
@@ -114,7 +115,7 @@ struct Physics
     bool useGravity{true};
 };
 
-// Oppgave 2.5 tracking av en ball med trace med bruk av B spline
+// Task 2.5 tracking av en ball med trace med bruk av B spline
 struct Tracking
 {
     float samplingInterval = 0.2f;

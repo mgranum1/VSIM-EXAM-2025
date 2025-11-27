@@ -327,6 +327,7 @@ void MainWindow::on_action_Open_triggered()
     QMessageBox::warning(this, "Why would you do this?", repeated, QMessageBox::No);
 }
 
+// Task 2.1 - Ball on surface
 void MainWindow::onButton1Clicked()
 {
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
@@ -368,6 +369,7 @@ void MainWindow::onButton1Clicked()
     updateSceneObjectList();
 }
 
+// Task 1.3 - Triangulated point cloud with phong shader
 void MainWindow::onButton2Clicked()
 {
     mVulkanWindow->spawnTerrain();
@@ -375,6 +377,7 @@ void MainWindow::onButton2Clicked()
     updateSceneObjectList();
 }
 
+// Task 2.6 - Fluid simulation
 void MainWindow::onButton3Clicked()
 {
 
@@ -387,6 +390,7 @@ void MainWindow::onButton3Clicked()
     spawnBallsDelay();
 }
 
+// Task 1.2 - Spawn point cloud
 void MainWindow::onButton4Clicked()
 {
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
@@ -438,7 +442,7 @@ void MainWindow::onButton5Clicked()
     updateSceneObjectList();
 }
 
-
+// Task 2.6 - Fluid simulation
 void MainWindow::spawnBallsDelay()
 {
     if (ballsSpawned >= maxBallsSpawn)

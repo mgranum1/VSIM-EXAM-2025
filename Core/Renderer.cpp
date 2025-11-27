@@ -318,7 +318,7 @@ void Renderer::createTerrainEntity(bbl::GameWorld* gameWorld) {
         renderComp->textureResourceID = textureResourceID;
         renderComp->usePoint = false;
         renderComp->useLine = false;
-        renderComp->usePhong = true;
+        renderComp->usePhong = true; // Task 1.3.3
     }
 
     m_gameWorld.setTerrainEntity(entity);

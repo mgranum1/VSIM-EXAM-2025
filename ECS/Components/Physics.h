@@ -18,14 +18,17 @@ public:
         m_entityManager = entityManager;
     }
 
-    // Rolling ball physics
+
     void setTerrain(Terrain* terrain) { m_terrain = terrain; }
+
+    // Task 2.1
     void enableRollingPhysics(bool enable) { m_rollingPhysicsEnabled = enable; }
 
     void setFrictionCoefficient(float coefficient);
     float getFrictionCoefficient() const;
     float getFrictionAtPosition(const glm::vec3& position);
 
+    // Task 2.3
     float frictionCoefficient;
     float zone_frictionCoefficient;
     glm::vec3 zone_frictionCenter = glm::vec3(0.f, 0.f, 0.f);
@@ -36,10 +39,11 @@ private:
     Terrain* m_terrain = nullptr;
     glm::vec3 m_gravity{0.0f, -9.81f, 0.0f};
 
+    // Task 2.1
     bool m_rollingPhysicsEnabled = false;
     glm::vec3 calculateFrictionForce(const glm::vec3& velocity, const glm::vec3& surfaceNormal, const glm::vec3 &position);
 
-    // Rolling physics methods
+    // Rolling physics funksjoner
     void updateRollingPhysics(EntityID entity, float dt);
     int findCurrentTriangle(const glm::vec3& position);
     bool isPointInTriangle(const glm::vec3& point, const glm::vec3& v0,

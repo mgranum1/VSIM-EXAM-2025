@@ -14,6 +14,7 @@ Terrain::~Terrain()
 {
 }
 
+// Task 1.3
 // Laste inn punktsky data
 bool Terrain::loadFromOBJ(const std::string& filepath)
 {
@@ -65,7 +66,7 @@ bool Terrain::loadFromOBJ(const std::string& filepath)
 
     return true;
 }
-
+// Task 2.1
 void Terrain::calculateNormals()
 {
     // Sett normaler til å være null
@@ -107,6 +108,7 @@ void Terrain::calculateNormals()
     }
 }
 
+// Task 2.1
 float Terrain::barycentric(const glm::vec2& p, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) const
 {
     glm::vec2 a2D(a.x, a.z);
@@ -162,6 +164,7 @@ float Terrain::getHeightAt(float worldX, float worldZ, const glm::vec3& terrainP
     return m_heightPlacement; // Punktet er ikke funnet i noen trekant
 }
 
+// Task 2.1
 bool Terrain::isPointInTriangleXZ(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const
 {
     // Bruker barysentriske koordinater for å finne ut om punktet er innen for en trekant
@@ -187,6 +190,7 @@ glm::vec3 Terrain::getCenter() const
     return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
+// Task 2.3
 // Skravere området rødt hvor det er ekstra mye friksjon
 void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radius, const glm::vec3& zoneColor)
 {
@@ -209,6 +213,7 @@ void Terrain::applyFrictionZoneColoring(const glm::vec3& zoneCenter, float radiu
     }
 }
 
+// Task 2.3
 // Brukes for å sette et friksjons område, tar inn hele terrainet og returner midt punktet av det
 glm::vec3 Terrain::calculateBounds(glm::vec3& minBounds, glm::vec3& maxBounds) const
 {
