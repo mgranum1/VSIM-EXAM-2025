@@ -168,7 +168,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
                 attrib.vertices[3 * vi + 2]
             };
 
-            // Normal - ADDED THIS SECTION
+            // Normal
             if (safe_attrib_normal_exists(attrib, index.normal_index)) {
                 vertex.normal = {
                     attrib.normals[3 * index.normal_index + 0],

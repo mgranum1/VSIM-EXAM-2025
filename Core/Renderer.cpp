@@ -91,8 +91,8 @@ void Renderer::initVulkan() {
     createDescriptorSetLayout();
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/point.frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/point.frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
     createCommandPool();
     createColorResources();
     createDepthResources();
@@ -109,7 +109,7 @@ void Renderer::initVulkan() {
 
     // Initialize GameWorld and load terrain      // Task 2.3
     m_gameWorld.Setup();                         // Sett til true for å ha friksjonsone på terrenget
-    m_gameWorld.initializeSystems(entityManager.get(), this, false);
+    m_gameWorld.initializeSystems(entityManager.get(), this, true);
 
     // Create ModelLoader instance
     bbl::ModelLoader modelLoader;
@@ -470,8 +470,8 @@ void Renderer::recreateSwapChain() {
     createRenderPass();
     createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", graphicsPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
     createGraphicsPipeline("Shaders/phong.vert.spv", "Shaders/phong.frag.spv", phongPipeline, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
-    createGraphicsPipeline("Shaders/vert.spv", "Shaders/frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/point.frag.spv", pointPipeline, VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
+    createGraphicsPipeline("Shaders/vert.spv", "Shaders/point.frag.spv", linePipeline, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
     createColorResources();
     createDepthResources();
     createFramebuffers();
