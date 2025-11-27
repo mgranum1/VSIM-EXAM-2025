@@ -180,6 +180,14 @@ QWidget* MainWindow::createTopBar()
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
+    QPushButton* button6 = new QPushButton("Clear Scene", topBar);
+    button6->setFixedSize(80, 40);
+    button6->setStyleSheet(
+        "QPushButton { background-color: #dc3545; color: white; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #e85563; }"
+        "QPushButton:pressed { background-color: #bb2d3b; }"
+        );
+
 
     // -----Play button------
     playButton = new QPushButton("▶ Play", topBar);
@@ -193,6 +201,7 @@ QWidget* MainWindow::createTopBar()
     topLayout->addWidget(button3);
     topLayout->addWidget(button4);
     topLayout->addWidget(button5);
+    topLayout->addWidget(button6);
     topLayout->addStretch();
     topLayout->addWidget(playButton);
     topLayout->addStretch();
@@ -203,6 +212,7 @@ QWidget* MainWindow::createTopBar()
     connect(button3, &QPushButton::clicked, this, &MainWindow::onButton3Clicked);
     connect(button4, &QPushButton::clicked, this, &MainWindow::onButton4Clicked);
     connect(button5, &QPushButton::clicked, this, &MainWindow::onButton5Clicked);
+    connect(button6, &QPushButton::clicked, this, &MainWindow::onButton6Clicked);
 
     return topBar;
 }
@@ -440,6 +450,60 @@ void MainWindow::onButton5Clicked()
 
     mVulkanWindow->recreateSwapChain();
     updateSceneObjectList();
+}
+
+void MainWindow::onButton6Clicked()
+{
+    // Vis bekreftelses boks
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Clear Scene",
+        "Slett alt på kartet?",
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    // Stopp spille modus hvis det kjører
+    if (isPlaying)
+    {
+        onPlayToggled();
+    }
+
+    mVulkanWindow->setSelectedEntity(bbl::EntityID{});
+
+    // Får scene manager og lager en ny scene
+    bbl::SceneManager* sceneManager = mVulkanWindow->getSceneManager();
+    if (sceneManager)
+    {
+        sceneManager->createNewScene("New Scene");
+    }
+
+    // Slett ting i component panelet
+    QLayoutItem* layoutItem;
+    while ((layoutItem = componentLayout->takeAt(0)) != nullptr)
+    {
+        delete layoutItem->widget();
+        delete layoutItem;
+    }
+
+    // Kan ikke legge til componenter
+    if (addComponentButton)
+    {
+        addComponentButton->setEnabled(false);
+    }
+
+    // Resett ball spawne telleren
+    ballsSpawned = 0;
+
+    // Oppdater bruker grensesnittet
+    updateSceneObjectList();
+    mVulkanWindow->recreateSwapChain();
+    mVulkanWindow->requestUpdate();
+
+    qInfo() << "Slettet scenen";
 }
 
 // Task 2.6 - Fluid simulation

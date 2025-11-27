@@ -114,6 +114,7 @@ private slots:
     void onButton3Clicked();
     void onButton4Clicked();
     void onButton5Clicked();
+    void onButton6Clicked();
 
     //=========================================================================
     // UI Interactions
