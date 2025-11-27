@@ -160,22 +160,22 @@ QWidget* MainWindow::createTopBar()
         );
 
     QPushButton* button3 = new QPushButton("Fluid simulation", topBar);
-    button2->setFixedSize(80, 40);
-    button2->setStyleSheet(
+    button3->setFixedSize(90, 40);
+    button3->setStyleSheet(
         "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
     QPushButton* button4 = new QPushButton("Point cloud", topBar);
-    button2->setFixedSize(80, 40);
-    button2->setStyleSheet(
+    button4->setFixedSize(80, 40);
+    button4->setStyleSheet(
         "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
     QPushButton* button5 = new QPushButton("Obstacles", topBar);
-    button2->setFixedSize(80, 40);
-    button2->setStyleSheet(
+    button5->setFixedSize(80, 40);
+    button5->setStyleSheet(
         "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
         "QPushButton:hover { background-color: #3399FF; }"
         );
