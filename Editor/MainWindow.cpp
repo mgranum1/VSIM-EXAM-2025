@@ -390,6 +390,7 @@ void MainWindow::onButton2Clicked()
 // Task 2.6 - Fluid simulation
 void MainWindow::onButton3Clicked()
 {
+    mVulkanWindow->spawnTerrain();
 
     if (!isPlaying)
     {
@@ -427,6 +428,8 @@ void MainWindow::onButton4Clicked()
 
 void MainWindow::onButton5Clicked()
 {
+    mVulkanWindow->spawnTerrain();
+
     for (int i = 0; i < 8; i++)
     {
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
