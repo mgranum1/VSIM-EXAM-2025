@@ -166,6 +166,13 @@ QWidget* MainWindow::createTopBar()
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
+    QPushButton* button4 = new QPushButton("Point cloud", topBar);
+    button2->setFixedSize(80, 40);
+    button2->setStyleSheet(
+        "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #3399FF; }"
+        );
+
 
     // -----Play button------
     playButton = new QPushButton("▶ Play", topBar);
@@ -177,6 +184,7 @@ QWidget* MainWindow::createTopBar()
     topLayout->addWidget(button1);
     topLayout->addWidget(button2);
     topLayout->addWidget(button3);
+    topLayout->addWidget(button4);
     topLayout->addStretch();
     topLayout->addWidget(playButton);
     topLayout->addStretch();
@@ -185,6 +193,7 @@ QWidget* MainWindow::createTopBar()
     connect(button1, &QPushButton::clicked, this, &MainWindow::onButton1Clicked);
     connect(button2, &QPushButton::clicked, this, &MainWindow::onButton2Clicked);
     connect(button3, &QPushButton::clicked, this, &MainWindow::onButton3Clicked);
+    connect(button4, &QPushButton::clicked, this, &MainWindow::onButton4Clicked);
 
     return topBar;
 }
@@ -368,6 +377,31 @@ void MainWindow::onButton3Clicked()
     ballsSpawned = 0;
     spawnBallsDelay();
 }
+
+void MainWindow::onButton4Clicked()
+{
+    bbl::EntityID entityID = mVulkanWindow->spawnModel(
+        "../../Assets/Models/pointcloud_new.obj",
+        "",
+        glm::vec3(0.0f, 0.0f, 0.0f)
+        );
+
+    bbl::EntityManager* entityManager = mVulkanWindow->getEntityManager();
+
+    bbl::Render* renderComp = entityManager->getComponent<bbl::Render>(entityID);
+    bbl::Transform* transformComp = entityManager->getComponent<bbl::Transform>(entityID);
+
+    renderComp->usePoint = true;
+    renderComp->useLine = false;
+    renderComp->usePhong = false;
+
+    transformComp->rotation.x = -1.6;
+    transformComp->position.y = -10;
+
+    mVulkanWindow->recreateSwapChain();
+    updateSceneObjectList();
+}
+
 
 void MainWindow::spawnBallsDelay()
 {
