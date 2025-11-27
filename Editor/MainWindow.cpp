@@ -173,6 +173,13 @@ QWidget* MainWindow::createTopBar()
         "QPushButton:hover { background-color: #3399FF; }"
         );
 
+    QPushButton* button5 = new QPushButton("Obstacles", topBar);
+    button2->setFixedSize(80, 40);
+    button2->setStyleSheet(
+        "QPushButton { background-color: #007ACC; color: white; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #3399FF; }"
+        );
+
 
     // -----Play button------
     playButton = new QPushButton("▶ Play", topBar);
@@ -185,6 +192,7 @@ QWidget* MainWindow::createTopBar()
     topLayout->addWidget(button2);
     topLayout->addWidget(button3);
     topLayout->addWidget(button4);
+    topLayout->addWidget(button5);
     topLayout->addStretch();
     topLayout->addWidget(playButton);
     topLayout->addStretch();
@@ -194,6 +202,7 @@ QWidget* MainWindow::createTopBar()
     connect(button2, &QPushButton::clicked, this, &MainWindow::onButton2Clicked);
     connect(button3, &QPushButton::clicked, this, &MainWindow::onButton3Clicked);
     connect(button4, &QPushButton::clicked, this, &MainWindow::onButton4Clicked);
+    connect(button5, &QPushButton::clicked, this, &MainWindow::onButton5Clicked);
 
     return topBar;
 }
@@ -322,7 +331,7 @@ void MainWindow::onButton1Clicked()
 {
     bbl::EntityID entityID = mVulkanWindow->spawnModel(
         "../../Assets/Models/Ball2.obj",
-        "../../Assets/Textures/Blue.jpg",
+        "../../Assets/Textures/sun.jpg",
         glm::vec3(370.0f, 200.0f, -290.0f)
         );
 
@@ -397,6 +406,33 @@ void MainWindow::onButton4Clicked()
 
     transformComp->rotation.x = -1.6;
     transformComp->position.y = -10;
+
+    mVulkanWindow->recreateSwapChain();
+    updateSceneObjectList();
+}
+
+void MainWindow::onButton5Clicked()
+{
+    for (int i = 0; i < 8; i++)
+    {
+    bbl::EntityID entityID = mVulkanWindow->spawnModel(
+        "../../Assets/Models/Cube.obj",
+        "../../Assets/Textures/notexture.jpg",
+        glm::vec3(0.f, 0.f, 0.f)
+        );
+
+    bbl::EntityManager* entityManager = mVulkanWindow->getEntityManager();
+
+    entityManager->addComponent(entityID, bbl::Collision{});
+
+    bbl::Collision* collisionComponent = entityManager->getComponent<bbl::Collision>(entityID);
+    bbl::Transform* transformComponent = entityManager->getComponent<bbl::Transform>(entityID);
+
+    collisionComponent->isStatic = true;
+    collisionComponent->colliderSize = glm::vec3(3, 3, 3);
+    transformComponent->position = glm::vec3(glm::vec3(250 + (i * 5), 85, -250 + (i * 8)));
+    transformComponent->scale = glm::vec3(4, 4, 4);
+    }
 
     mVulkanWindow->recreateSwapChain();
     updateSceneObjectList();
