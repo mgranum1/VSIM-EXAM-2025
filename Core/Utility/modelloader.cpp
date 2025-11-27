@@ -229,47 +229,46 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
     if (modelData.meshes.empty() && !attrib.vertices.empty())
     {
         qDebug() << "OBJ has vertices but no faces. Creating point-cloud mesh.";
-
         MeshData meshData;
         meshData.materialIndex = modelData.materials.empty() ? -1 : 0;
-
         size_t vertexCount = attrib.vertices.size() / 3;
         meshData.vertices.reserve(vertexCount);
         meshData.indices.reserve(vertexCount);
 
+        // Finner først minste og høyeste høyde verdi
+        float minHeight = std::numeric_limits<float>::max();
+        float maxHeight = std::numeric_limits<float>::lowest();
+
+        for (size_t vi = 0; vi < vertexCount; ++vi) {
+            float height = attrib.vertices[3 * vi + 2];
+            minHeight = std::min(minHeight, height);
+            maxHeight = std::max(maxHeight, height);
+        }
+
+        qDebug() << "Height range:" << minHeight << "to" << maxHeight;
+
+        // Lager verticene med høyde basert farge
         for (size_t vi = 0; vi < vertexCount; ++vi)
         {
             Vertex v{};
-
             v.pos = {
                 attrib.vertices[3 * vi + 0],
                 attrib.vertices[3 * vi + 1],
                 attrib.vertices[3 * vi + 2]
             };
 
-            // Legger til normal for punkt sky, normal oppover
             v.normal = {0.0f, 1.0f, 0.0f};
 
-            if (attrib.colors.size() > 3 * vi + 2) {
-                v.color = {
-                    attrib.colors[3 * vi + 0],
-                    attrib.colors[3 * vi + 1],
-                    attrib.colors[3 * vi + 2]
-                };
-            } else {
-                v.color = {1.0f, 1.0f, 1.0f};
-            }
+            // Fargen skal gå fra mørkt (bunnen av terrenget) til lyst (toppen av terrenget)
+            float height = attrib.vertices[3 * vi + 2];
+            float normalizedHeight = (height - minHeight) / (maxHeight - minHeight);
+            v.color = {normalizedHeight, normalizedHeight, normalizedHeight};
 
             v.texCoord = {0.0f, 0.0f};
-
-            meshData.indices.push_back(
-                static_cast<uint32_t>(meshData.vertices.size())
-                );
+            meshData.indices.push_back(static_cast<uint32_t>(meshData.vertices.size()));
             meshData.vertices.push_back(v);
         }
-
         modelData.meshes.push_back(std::move(meshData));
-
         qDebug() << "Point-cloud mesh created:"
                  << "vertices:" << vertexCount
                  << "indices:"  << vertexCount;
