@@ -34,7 +34,7 @@ public:
     }
 
 
-    void initializeSystems(EntityManager* entityManager, Renderer* renderer);
+    void initializeSystems(EntityManager* entityManager, Renderer* renderer, bool enableFrictionZone);
 
     void setupFrictionZone();
 

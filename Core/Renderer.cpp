@@ -107,9 +107,9 @@ void Renderer::initVulkan() {
     // Initialize SceneManager
     sceneManager.reset(new bbl::SceneManager(entityManager.get(), GPUresources.get()));
 
-    // Initialize GameWorld and load terrain
-    m_gameWorld.Setup();
-    m_gameWorld.initializeSystems(entityManager.get(), this);
+    // Initialize GameWorld and load terrain      // Task 2.3
+    m_gameWorld.Setup();                         // Sett til false for å ikke ha friksjonsone
+    m_gameWorld.initializeSystems(entityManager.get(), this, false);
 
     // Create ModelLoader instance
     bbl::ModelLoader modelLoader;
@@ -317,6 +317,8 @@ void Renderer::createTerrainEntity(bbl::GameWorld* gameWorld) {
     if (auto* renderComp = entityManager->getComponent<bbl::Render>(entity)) {
         renderComp->textureResourceID = textureResourceID;
         renderComp->usePoint = false;
+        renderComp->useLine = false;
+        renderComp->usePhong = true;
     }
 
     m_gameWorld.setTerrainEntity(entity);

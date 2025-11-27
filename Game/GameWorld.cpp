@@ -55,7 +55,7 @@ void bbl::GameWorld::setupFrictionZone()
 }
 
 
-void bbl::GameWorld::initializeSystems(EntityManager* entityManager, Renderer* renderer)
+void bbl::GameWorld::initializeSystems(EntityManager* entityManager, Renderer* renderer, bool enableFrictionZone)
 {
     if (!entityManager) {
         qWarning() << "Cannot initialize systems: EntityManager is null!";
@@ -70,7 +70,10 @@ void bbl::GameWorld::initializeSystems(EntityManager* entityManager, Renderer* r
     m_physicsSystem->setTerrain(m_terrain.get());
     m_physicsSystem->enableRollingPhysics(true);
 
-    setupFrictionZone();
+    if(enableFrictionZone)
+    {
+       setupFrictionZone();
+    }
 
     // Collision System
     m_collisionSystem = std::make_unique<CollisionSystem>(entityManager, m_terrain.get());
