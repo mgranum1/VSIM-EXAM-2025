@@ -108,7 +108,7 @@ void Renderer::initVulkan() {
     sceneManager.reset(new bbl::SceneManager(entityManager.get(), GPUresources.get()));
 
     // Initialize GameWorld and load terrain      // Task 2.3
-    m_gameWorld.Setup();                         // Sett til false for å ikke ha friksjonsone
+    m_gameWorld.Setup();                         // Sett til true for å ha friksjonsone på terrenget
     m_gameWorld.initializeSystems(entityManager.get(), this, false);
 
     // Create ModelLoader instance
