@@ -1,4 +1,4 @@
-//Oppgave 1.3 - Regular triangulering
+//Oppgave 1.3 - Regulær triangulering
 
 
 // Lager et triangulert terreng med normaler og
