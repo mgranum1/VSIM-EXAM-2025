@@ -235,7 +235,7 @@ void ModelLoader::loadOBJ(const std::string& modelPath,
         meshData.vertices.reserve(vertexCount);
         meshData.indices.reserve(vertexCount);
 
-        // Finner først minste og høyeste høyde verdi
+        // Finner først minste, så høyeste høyde verdi
         float minHeight = std::numeric_limits<float>::max();
         float maxHeight = std::numeric_limits<float>::lowest();
 
