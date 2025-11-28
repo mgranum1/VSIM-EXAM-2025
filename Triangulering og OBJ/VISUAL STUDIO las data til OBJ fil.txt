@@ -1,0 +1,85 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+int main() {
+    std::string input_file = "C:\\Users\\x\\Downloads\\las\\lasdata_final.txt";
+    std::string output_file = "C:\\Users\\x\\Downloads\\las\\pointcloud_new.obj";
+
+    std::ifstream infile(input_file);
+    if (!infile.is_open()) {
+        std::cerr << "Kunne ikke åpne input-fil: " << input_file << std::endl;
+        return 1;
+    }
+
+    // Les første punkt for å bruke som "origo" og tell antall punkter
+    double shiftX = 0, shiftY = 0, shiftZ = 0;
+    std::vector<std::string> validLines;
+    bool firstPointFound = false;
+
+    std::string line;
+    while (std::getline(infile, line)) {
+        std::istringstream iss(line);
+        double x, y, z;
+        int r, g, b, u, v;
+
+        if (iss >> x >> y >> z >> r >> g >> b >> u >> v) {
+            if (!firstPointFound) {
+                shiftX = x;
+                shiftY = y;
+                shiftZ = z;
+                firstPointFound = true;
+                std::cout << "Shifter punktsky med ("
+                    << shiftX << ", " << shiftY << ", " << shiftZ << ")\n";
+            }
+            validLines.push_back(line);
+        }
+    }
+    infile.close();
+
+    int totalPoints = validLines.size();
+    std::cout << "Totalt antall punkter: " << totalPoints << std::endl;
+
+    // Skriv til output-fil
+    std::ofstream outfile(output_file);
+    if (!outfile.is_open()) {
+        std::cerr << "Kunne ikke åpne output-fil: " << output_file << std::endl;
+        return 1;
+    }
+
+    // Skriv antall punkter som kommentar øverst i fila
+    outfile << "# Total number of points: " << totalPoints << "\n";
+    outfile << "# Point cloud data converted from LAS format\n";
+    outfile << "\n";
+
+    // Prosesser alle gyldige linjer
+    for (const std::string& validLine : validLines) {
+        std::istringstream iss(validLine);
+        double x, y, z;
+        int r, g, b, u, v;
+
+        iss >> x >> y >> z >> r >> g >> b >> u >> v;
+
+        // Shift koordinatene slik at første punkt blir (0,0,0)
+        x -= shiftX;
+        y -= shiftY;
+        z -= shiftZ;
+
+        // Normaliser farger fra 0-65535 til 0-1
+        double rf = r / 65535.0;
+        double gf = g / 65535.0;
+        double bf = b / 65535.0;
+
+        // Skriv punkt til .obj
+        outfile << "v " << x << " " << y << " " << z << " "
+            << rf << " " << gf << " " << bf << "\n";
+    }
+
+    outfile.close();
+    std::cout << "Ferdig! Punktsky eksportert til: " << output_file << std::endl;
+    std::cout << "Antall punkter skrevet: " << totalPoints << std::endl;
+
+    return 0;
+}

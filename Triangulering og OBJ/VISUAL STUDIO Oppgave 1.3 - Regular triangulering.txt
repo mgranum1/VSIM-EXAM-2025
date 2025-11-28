@@ -1,0 +1,475 @@
+//Oppgave 1.3 - Regular triangulering
+
+
+// Lager et triangulert terreng med normaler og
+// UV-koordinater fra en punktsky-OBJ (v x y z r g b)
+// og lagrer det som en ny OBJ-fil.
+
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <limits>
+#include <cmath>
+#include <cstdint>
+
+// Definerer først 
+
+struct Vec3 {
+    float x, y, z;
+};
+
+struct Vec2 {
+    float u, v;
+};
+
+struct Color {
+    float r, g, b;
+};
+
+struct Vertex {
+    Vec3 position;
+    Vec3 normal;
+    Vec2 texCoord;  // UV koordinator for å sette på teksturer på Terrenget
+};
+
+// Vektor-hjelpefunksjoner 
+
+inline Vec3 make_vec3(float x, float y, float z)
+{
+    Vec3 v{ x, y, z };
+    return v;
+}
+
+inline Vec2 make_vec2(float u, float v)
+{
+    Vec2 uv{ u, v };
+    return uv;
+}
+
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    return make_vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+inline Vec3& operator+=(Vec3& a, const Vec3& b)
+{
+    a.x += b.x; a.y += b.y; a.z += b.z;
+    return a;
+}
+
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    return make_vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+inline Vec3 operator*(const Vec3& a, float s)
+{
+    return make_vec3(a.x * s, a.y * s, a.z * s);
+}
+
+inline float dot(const Vec3& a, const Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+//Denne blir brukt i beregninger av normaler
+inline Vec3 cross(const Vec3& a, const Vec3& b)
+{
+    return make_vec3(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
+    );
+}
+
+inline float length(const Vec3& a)
+{
+    return std::sqrt(dot(a, a));
+}
+
+//Blir brukt til å få normalvektoren normalisert, Kap 6.2.1
+inline Vec3 normalize(const Vec3& a)
+{
+    float len = length(a);
+    if (len > 1e-6f) {
+        float inv = 1.0f / len;
+        return make_vec3(a.x * inv, a.y * inv, a.z * inv);
+    }
+    // fallback-normal (opp)
+    return make_vec3(0.0f, 1.0f, 0.0f);
+}
+
+
+// Leser inn Punktsky OBJ
+bool loadPointCloudOBJ(
+    const std::string& filename,
+    std::vector<Vec3>& points,
+    std::vector<Color>& colors
+)
+{
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Kunne ikke åpne fil: " << filename << "\n";
+        return false;
+    }
+
+    points.clear();
+    colors.clear();
+
+    std::string line;
+    while (std::getline(file, line)) {
+        // Hopp over kommentarer og tomme linjer
+        if (line.empty() || line[0] == '#')
+            continue;
+
+        // Vi er kun interessert i vertex-linjer
+        if (line.size() > 2 && line[0] == 'v' && line[1] == ' ') {
+
+            std::stringstream ss(line);
+
+            char vchar;
+            float x, y, z;
+            float r = 1.0f, g = 1.0f, b = 1.0f; // default hvit
+
+            ss >> vchar >> x >> y >> z;
+
+            // Hvis det finnes farger, les dem
+            if (ss >> r >> g >> b) {
+                // ok
+            }
+
+            if (!ss.fail()) {
+                points.push_back(make_vec3(x, y, z));
+                colors.push_back({ r, g, b });
+            }
+        }
+    }
+
+    std::cout << "Loaded " << points.size()
+        << " points from " << filename << "\n";
+    return true;
+}
+
+
+// Bygg height-grid fra råpunkter
+// cellSize: størrelse på gridcelle 
+// nx, ny: antall celler i x- og y-retning
+// heightGrid: sum(z) per celle
+// countGrid: antall punkter per celle
+// xmin, ymin: nedre venstre hjørne av området
+
+//Dette er fra Kapittel 11.4, s. 166
+// Trinn 1: Vi finner bounding box (xmin,xmax,ymin,ymax) – figur 11.7, dette får jeg når filen leses inn
+// Trinn 2: Bestem hjørner til rektangulært område 
+// Trinn 4a: Bestem hvilken rute hvert datapunkt tilhører
+// Trinn 4b: Bruk midtpunktet i ruta som xy-verdi
+// Trinn 4c: Registrer høyden (gjennomsnittsz) for midtpunktet
+// Trinn 5: Lag grid-vertices (midtpunkt + gjennomsnittlig høyde + UV coordinates)
+
+void buildHeightGrid(
+    const std::vector<Vec3>& rawPoints,
+    float cellSize, // Trinn 3 i algoritme 11.4: Velg en oppløsning
+    int& nx, int& ny,
+    std::vector<float>& heightGrid,
+    std::vector<int>& countGrid,
+    float& xmin, float& ymin
+)
+
+	
+
+{
+    float xmax = -std::numeric_limits<float>::infinity();
+    float ymax = -std::numeric_limits<float>::infinity();
+    xmin = std::numeric_limits<float>::infinity();
+    ymin = std::numeric_limits<float>::infinity();
+
+    // Finn bounding box i xy
+    for (const auto& p : rawPoints) {
+        if (p.x < xmin) xmin = p.x;
+        if (p.x > xmax) xmax = p.x;
+        if (p.y < ymin) ymin = p.y;
+        if (p.y > ymax) ymax = p.y;
+    }
+
+    nx = static_cast<int>(std::floor((xmax - xmin) / cellSize)) + 1;
+    ny = static_cast<int>(std::floor((ymax - ymin) / cellSize)) + 1;
+
+    std::cout << "Bounding box x:[" << xmin << "," << xmax
+        << "], y:[" << ymin << "," << ymax << "]\n";
+    std::cout << "Grid cells: " << nx << " x " << ny << "\n";
+
+    heightGrid.assign(nx * ny, 0.0f);
+    countGrid.assign(nx * ny, 0);
+
+    auto idx = [ny](int ix, int iy) {
+        return iy + ix * ny;
+        };
+
+    // Akkumuler z-verdier i hver celle
+    for (const auto& p : rawPoints) {
+        int ix = static_cast<int>((p.x - xmin) / cellSize);
+        int iy = static_cast<int>((p.y - ymin) / cellSize);
+
+        if (ix < 0 || ix >= nx || iy < 0 || iy >= ny)
+            continue;
+
+        int i = idx(ix, iy);
+        heightGrid[i] += p.z;
+        countGrid[i] += 1;
+    }
+}
+
+// Lager grid vertices med UV koordinater, tilsvarer figur 11.7 med midtpunkt og gjennomsnittshøyde
+// samt figur 11.9 med UV fra grid posisjon
+void buildGridVertices(
+    float cellSize,
+    int nx, int ny,
+    float xmin, float ymin,
+    const std::vector<float>& heightGrid,
+    const std::vector<int>& countGrid,
+    std::vector<Vertex>& vertices
+) {
+    vertices.clear();
+    vertices.reserve(nx * ny);
+
+    auto idx = [ny](int ix, int iy) {
+        return iy + ix * ny;
+        };
+
+    for (int ix = 0; ix < nx; ++ix) 
+    {
+        for (int iy = 0; iy < ny; ++iy) 
+        {
+            int i = idx(ix, iy);
+
+            float x = xmin + (ix + 0.5f) * cellSize;
+            float y = ymin + (iy + 0.5f) * cellSize;
+
+            float z = 0.0f;
+            if (countGrid[i] > 0) 
+            {
+                z = heightGrid[i] / static_cast<float>(countGrid[i]);
+            }
+            else 
+            {
+                // Ingen punkt i cellen
+                z = 0.0f;
+            }
+
+            // Lager UV koordinater basert på grid posisjon
+            // Vanlig å gjøre på denne måten for regulære heightfield-meshes
+            // (se figur 11.9 "x-linje er altså midtpunkt i hver rute")
+            float u = static_cast<float>(ix) / static_cast<float>(nx - 1);
+            float v = static_cast<float>(iy) / static_cast<float>(ny - 1);
+
+            Vertex vertex;
+            vertex.position = make_vec3(x, y, z);
+            vertex.normal = make_vec3(0.0f, 0.0f, 0.0f);
+            vertex.texCoord = make_vec2(u, v);  // Add UV coordinates
+            vertices.push_back(vertex);
+        }
+    }
+}
+
+// 6. Lager trekanter (indices) fra grid
+
+// To trekanter "A-B-C" og "B-D-C" per celle – se figur 11.8
+// Dette er den enkleste formen for regulær triangulering
+
+
+void buildGridTriangles(
+    int nx, int ny,
+    std::vector<uint32_t>& indices
+) {
+    indices.clear();
+    indices.reserve((nx - 1) * (ny - 1) * 6); // 2 trekanter per celle, 3 indices per trekant
+
+    auto idx = [ny](int ix, int iy) {
+        return static_cast<uint32_t>(iy + ix * ny);
+        };
+    
+    for (int ix = 0; ix < nx - 1; ++ix) {
+        for (int iy = 0; iy < ny - 1; ++iy) {
+
+            uint32_t A = idx(ix, iy);
+            uint32_t B = idx(ix + 1, iy);
+            uint32_t C = idx(ix, iy + 1);
+            uint32_t D = idx(ix + 1, iy + 1);
+
+            // Triangel 1: A, B, C
+            indices.push_back(A);
+            indices.push_back(B);
+            indices.push_back(C);
+
+            // Triangel 2: B, D, C
+            indices.push_back(B);
+            indices.push_back(D);
+            indices.push_back(C);
+        }
+    }
+}
+
+// 7. Beregner vertex-normaler
+// Kapittel 6.2.1 "Normalvektorer til en flate"
+// arealvektet gjennomsnitt (side 88–89)
+
+
+// Beregn vertex-normaler fra trekanter
+// bruker arealvektet gjennomsnitt av trekant-normaler
+
+// Kryssprodukt for hver trekant → arealvektet normal (side 88)
+// Summerer bidrag fra nabotrekanter → glatt normal (anbefalt i kapittel 6.2.1)
+// Til slutt normalisering
+
+
+void computeVertexNormals(
+    std::vector<Vertex>& vertices,
+    const std::vector<uint32_t>& indices
+) {
+    // Null ut normalene
+    for (auto& v : vertices) {
+        v.normal = make_vec3(0.0f, 0.0f, 0.0f);
+    }
+
+    const size_t triCount = indices.size() / 3;
+
+    for (size_t t = 0; t < triCount; ++t) {
+        uint32_t i0 = indices[3 * t + 0];
+        uint32_t i1 = indices[3 * t + 1];
+        uint32_t i2 = indices[3 * t + 2];
+
+        Vec3& p0 = vertices[i0].position;
+        Vec3& p1 = vertices[i1].position;
+        Vec3& p2 = vertices[i2].position;
+
+        Vec3 e1 = p1 - p0;
+        Vec3 e2 = p2 - p0;
+
+        Vec3 n = cross(e1, e2); // ikke normalisert (arealvektet)
+        float len2 = dot(n, n);
+        if (len2 < 1e-12f) continue; // degenerert trekant
+
+        vertices[i0].normal += n;
+        vertices[i1].normal += n;
+        vertices[i2].normal += n;
+    }
+
+    for (auto& v : vertices) {
+        float len2 = dot(v.normal, v.normal);
+        if (len2 > 1e-12f) {
+            v.normal = normalize(v.normal);
+        }
+        else {
+            v.normal = make_vec3(0.0f, 1.0f, 0.0f); // fallback-normal
+        }
+    }
+}
+
+
+// Lagrer det ferdige terrenget 
+bool saveOBJ(
+    const std::string& filename,
+    const std::vector<Vertex>& vertices,
+    const std::vector<uint32_t>& indices
+) {
+    std::ofstream out(filename);
+    if (!out.is_open()) {
+        std::cerr << "Kunne ikke lage OBJ file: " << filename << "\n";
+        return false;
+    }
+
+    // Vertices
+    for (const auto& v : vertices) {
+        out << "v " << v.position.x << " "
+            << v.position.y << " "
+            << v.position.z << "\n";
+    }
+
+    // Tekstur koordinator
+    for (const auto& v : vertices) {
+        out << "vt " << v.texCoord.u << " "
+            << v.texCoord.v << "\n";
+    }
+
+    // Normaler
+    for (const auto& v : vertices) {
+        out << "vn " << v.normal.x << " "
+            << v.normal.y << " "
+            << v.normal.z << "\n";
+    }
+
+    // Faces (v/vt/vn format)
+    for (size_t i = 0; i < indices.size(); i += 3) {
+        uint32_t a = indices[i + 0] + 1; // OBJ er 1-basert
+        uint32_t b = indices[i + 1] + 1;
+        uint32_t c = indices[i + 2] + 1;
+
+        out << "f "
+            << a << "/" << a << "/" << a << " "
+            << b << "/" << b << "/" << b << " "
+            << c << "/" << c << "/" << c << "\n";
+    }
+
+    std::cout << "Lagret OBJ fil med UV coordinates: " << filename << "\n";
+    return true;
+}
+
+
+int main(int argc, char** argv) {
+    std::string filename = "C:/Users/marti/Downloads/las/pointcloud_new.obj";
+
+    if (argc >= 2) {
+        filename = argv[1];
+    }
+
+    float cellSize = 5.0f; // Størrelsen på Cellene som blir laget, satt til 5 meter
+    if (argc >= 3) {
+        cellSize = std::stof(argv[2]);
+    }
+
+    std::vector<Vec3>   rawPoints;
+    std::vector<Color>  rawColors;
+
+    if (!loadPointCloudOBJ(filename, rawPoints, rawColors)) {
+        return -1;
+    }
+
+    if (rawPoints.empty()) {
+        std::cerr << "Ingen punkt funnet. Avslutter.\n";
+        return -1;
+    }
+
+    int nx, ny;
+    float xmin, ymin;
+    std::vector<float> heightGrid;
+    std::vector<int>   countGrid;
+
+    buildHeightGrid(rawPoints, cellSize,
+        nx, ny,
+        heightGrid, countGrid,
+        xmin, ymin);
+
+    std::vector<Vertex> vertices;
+    buildGridVertices(cellSize, nx, ny,
+        xmin, ymin,
+        heightGrid, countGrid,
+        vertices);
+
+    std::vector<uint32_t> indices;
+    buildGridTriangles(nx, ny, indices);
+
+    computeVertexNormals(vertices, indices);
+
+    std::cout << "Final mesh:\n";
+    std::cout << "  Vertices : " << vertices.size() << "\n";
+    std::cout << "  Triangles: " << indices.size() / 3 << "\n";
+
+    // Lagrer en regulært triangulært OBJ med UV-koordinater
+    saveOBJ("pointcloud_triangulated_with_uv_higher_cellsz.obj", vertices, indices);
+
+    return 0;
+}
+
+
